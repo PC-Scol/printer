@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.2.0.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.10.0')
+    implementation('fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:2.0.2')
+    implementation('fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:2.0.2')
+    implementation('fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:2.0.2')
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+bootJar {
+    mainClassName = 'fr.pcscol.printer.PrinterApplication'
+}
