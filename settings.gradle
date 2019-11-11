@@ -1,5 +1,6 @@
 rootProject.name = 'printer'
 
-include 'api'
-include 'server'
+include ':printer-api'
+include ':client:printer-adapter'
+include ':printer-server'
 

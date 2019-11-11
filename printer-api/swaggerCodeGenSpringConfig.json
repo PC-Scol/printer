@@ -1,0 +1,11 @@
+{
+  "library": "spring-mvc",
+  "dateLibrary": "java8",
+  "hideGenerationTimestamp": true,
+  "invokerPackage": "fr.pcscol.printer",
+  "modelPackage": "fr.pcscol.printer.api.model",
+  "apiPackage": "fr.pcscol.printer.api",
+  "interfaceOnly": true,
+  "useTags": true,
+  "useBeanValidation": true
+}

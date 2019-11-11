@@ -1,0 +1,62 @@
+openapi: 3.0.1
+info:
+  title: Printer Service API
+  description: Document printing API
+  version: 1.0.0
+
+servers:
+  - url: http://printer/v1
+
+tags:
+  - name: printer
+    description: Printer resource
+
+paths:
+  '/print':
+    post:
+      tags:
+        - printer
+      summary: Print a document
+      operationId: print
+      requestBody:
+        description: A PrintMessage
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintMessage'
+      responses:
+        '201':
+          description: Document has been successfully generated
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+            'application/vnd.oasis.opendocument.text':
+              schema:
+                type: string
+                format: byte
+            'application/msword':
+              schema:
+                type: string
+                format: byte
+        '404':
+          description: Template not found
+        '500':
+          description: Unexpected error.
+
+
+components:
+  schemas:
+    PrintMessage:
+      required:
+        - templateUrl
+        - data
+      properties:
+        templateUrl:
+          type: string
+          description: URL of the template used for the generation. Can be either absolute or relative (to a configured base url).
+        data:
+          type: object
+          description: The input object to print

@@ -1,0 +1,84 @@
+plugins {
+    id 'java'
+    id 'maven'
+    id 'maven-publish'
+    id 'io.spring.dependency-management'
+}
+
+
+project.version= "0.0.1-SNAPSHOT"
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+    }
+}
+
+configurations {
+    apiArtifact // Artefact de l'API
+    swaggerCodegen // Exécutable Swagger codegen-cli
+}
+
+dependencies {
+    // Add dependency for Swagger Codegen CLI
+    swaggerCodegen(group: 'io.swagger.codegen.v3', name: 'swagger-codegen-cli', version: "${swaggerCodegenCli3Version}") {
+        transitive = false
+    }
+
+    // Compilation des classes java générées par swagger
+    compileOnly 'javax.servlet:javax.servlet-api'
+    compileOnly 'javax.validation:validation-api'
+    compileOnly 'org.slf4j:slf4j-api'
+    compileOnly "io.swagger:swagger-annotations:${swaggerAnnotationsVersion}"
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind'
+    compileOnly 'org.springframework:spring-webmvc'
+
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$project.buildDir/generated/src/main/java"
+        }
+    }
+}
+
+task("swaggerAggregateFiles", type: SwaggerAggregateFiles) {
+    group 'Source Generation'
+    description 'Aggrège les différents fichiers yml de description d\'API en un seul.'
+}
+
+
+task("swaggerCodeGen", type: SwaggerCodeGenTaskV3) {
+    group 'Source Generation'
+    description 'Génère les sources de l\'API à partir du fichier yml.'
+}
+
+swaggerCodeGen.dependsOn swaggerAggregateFiles
+compileJava.dependsOn swaggerCodeGen
+
+swaggerAggregateFiles {
+    apiFiles = fileTree(dir: 'yml', includes: ['**/*.yml'])
+    output = file("$buildDir/swagger/printer-api.yml")
+}
+swaggerCodeGen {
+    apiFile = file("${project(':printer-api').projectDir}/yml/printer-api.yml")
+    lang = 'spring'
+    configFile = file('swaggerCodeGenSpringConfig.json')
+}
+
+def apiFile = file("$buildDir/swagger/printer-api.yml")
+def apiArtifact = artifacts.add("apiArtifact", apiFile) {
+    type "yml"
+    builtBy swaggerAggregateFiles
+}
+
+publishing {
+    publications {
+        api(MavenPublication) {
+            groupId 'fr.pcscol.printer'
+            artifactId 'printer-api'
+            artifact apiArtifact
+        }
+    }
+}

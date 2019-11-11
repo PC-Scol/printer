@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'maven'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+project.version= "0.0.1-SNAPSHOT"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+    }
+}
+
+dependencies {
+
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+    implementation project(':printer-api')
+    testImplementation project(':client:printer-adapter')
+
+    //xdocreport
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xDocReportVersion}")
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xDocReportVersion}")
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}")
+
+    // Swagger
+    implementation "io.springfox:springfox-swagger2:${springfoxSwagger2Version}"
+    runtimeOnly "io.springfox:springfox-swagger-ui:${springfoxSwaggerUiVersion}"
+
+}
+
+test {
+    useJUnit()
+}
+
+bootJar {
+    mainClassName = 'fr.pcscol.printer.PrinterApplication'
+}
