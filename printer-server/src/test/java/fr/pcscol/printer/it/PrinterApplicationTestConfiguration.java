@@ -1,4 +1,4 @@
-package fr.pcscol.printer;
+package fr.pcscol.printer.it;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

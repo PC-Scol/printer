@@ -1,0 +1,7 @@
+CERTIFICAT DE SCOLARITÉ
+
+
+
+
+
+L’étudiant ${firstName} ${lastName} est bien inscrit !
