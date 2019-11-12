@@ -41,22 +41,51 @@ paths:
               schema:
                 type: string
                 format: byte
+        '400':
+          description: Bad request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Template not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 
 components:
   schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
     PrintMessage:
+      type: object
       required:
         - templateUrl
+        - convert
         - data
       properties:
         templateUrl:
           type: string
           description: URL of the template used for the generation. Can be either absolute or relative (to a configured base url).
+        convert:
+          type: boolean
+          description: To indicate whether document must be converted to PDF or not.
         data:
           type: object
           description: The input object to print
