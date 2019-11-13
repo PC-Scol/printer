@@ -1,11 +1,13 @@
 package fr.pcscol.printer.controller;
 
+import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.PrinterApi;
 import fr.pcscol.printer.api.model.PrintMessage;
 import fr.pcscol.printer.service.PrinterService;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,18 +34,8 @@ public class PrinterController implements PrinterApi {
     @Autowired
     private PrinterService printerService;
 
-    @Autowired
-    private URLHelper urlHelper;
-
-    private MediaType getMediaType(String fileName) {
-        String mimeType = servletContext.getMimeType(fileName);
-        try {
-            MediaType mediaType = MediaType.parseMediaType(mimeType);
-            return mediaType;
-        } catch (Exception e) {
-            return MediaType.APPLICATION_OCTET_STREAM;
-        }
-    }
+    @Value("${printer.template.base-url}")
+    private String templateBaseUrl;
 
     @Override
     public ResponseEntity<byte[]> print(@NotNull PrintMessage body) {
@@ -51,7 +43,7 @@ public class PrinterController implements PrinterApi {
         //check template url is valid and complete it if not absolute
         URL templateUrl;
         try {
-            templateUrl = urlHelper.completeUrl(body.getTemplateUrl());
+            templateUrl = PrinterUtil.completeUrl(body.getTemplateUrl(), templateBaseUrl);
         } catch (MalformedURLException e) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, e.getMessage(), e);
@@ -67,10 +59,11 @@ public class PrinterController implements PrinterApi {
                 printerService.generate(templateUrl, data, convert, outputStream);
                 //success response
                 byte[] content = outputStream.toByteArray();
+                String fileName = PrinterUtil.extractOutputFileName(templateUrl.getPath(), String.valueOf(System.currentTimeMillis()), convert);
                 return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=test.pdf")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))
                         // Content-Type
-                        .contentType(convert == true ? MediaType.APPLICATION_PDF : getMediaType(templateUrl.getFile()))
+                        .contentType(convert == true ? MediaType.APPLICATION_PDF : MediaType.valueOf(PrinterUtil.getMimeType(templateUrl.getFile())))
                         .contentLength(content.length)
                         .body(content);
             } catch (TemplateNotFoundException e) {

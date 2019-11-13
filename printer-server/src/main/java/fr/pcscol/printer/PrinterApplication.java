@@ -1,6 +1,5 @@
 package fr.pcscol.printer;
 
-import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -11,9 +10,6 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import javax.annotation.PostConstruct;
-import java.net.URL;
-import java.net.URLStreamHandlerFactory;
 import java.util.Collections;
 
 @SpringBootApplication
@@ -30,8 +26,8 @@ public class PrinterApplication {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("v1")
                 .apiInfo(new ApiInfo(
-                        "API Printer Service",
-                        "Webservice d'impression de documents",
+                        "Printer Service API",
+                        "Generates documents (odt, docx, doc, pdf) by merging a template (odt, docx, doc) and a data model.",
                         "1.0.0",
                         "",
                         null,
@@ -41,6 +37,6 @@ public class PrinterApplication {
                 ))
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("fr.pcscol.printer.controller"))
-                .build().tags(new Tag("printer", "printer operations"));
+                .build().tags(new Tag("printer", "The printer resource"));
     }
 }

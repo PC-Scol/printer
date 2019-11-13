@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Printer Service API
-  description: Document printing API
+  description: Generates documents (odt, docx, doc, pdf) by merging a template (odt, docx, doc) and a data model.
   version: 1.0.0
 
 servers:
@@ -9,14 +9,14 @@ servers:
 
 tags:
   - name: printer
-    description: Printer resource
+    description: The printer resource
 
 paths:
   '/print':
     post:
       tags:
         - printer
-      summary: Print a document
+      summary: Produces a document (odt, docx, doc, pdf) by merging the template and data provided within the PrintMessage
       operationId: print
       requestBody:
         description: A PrintMessage
@@ -34,6 +34,10 @@ paths:
                 type: string
                 format: byte
             'application/vnd.oasis.opendocument.text':
+              schema:
+                type: string
+                format: byte
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
               schema:
                 type: string
                 format: byte
@@ -71,8 +75,10 @@ components:
       properties:
         code:
           type: string
+          description: The Http error code
         message:
           type: string
+          description: The reason
     PrintMessage:
       type: object
       required:
@@ -85,7 +91,7 @@ components:
           description: URL of the template used for the generation. Can be either absolute or relative (to a configured base url).
         convert:
           type: boolean
-          description: To indicate whether document must be converted to PDF or not.
+          description: When true the generated document is converted to pdf.
         data:
           type: object
-          description: The input object to print
+          description: The data model to merge.
