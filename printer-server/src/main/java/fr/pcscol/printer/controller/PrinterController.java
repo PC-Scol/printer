@@ -56,10 +56,13 @@ public class PrinterController implements PrinterApi {
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             try {
+                //invoke generation
                 printerService.generate(templateUrl, data, convert, outputStream);
                 //success response
                 byte[] content = outputStream.toByteArray();
+                //extract output file name
                 String fileName = PrinterUtil.extractOutputFileName(templateUrl.getPath(), String.valueOf(System.currentTimeMillis()), convert);
+                //return response
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))
                         // Content-Type
