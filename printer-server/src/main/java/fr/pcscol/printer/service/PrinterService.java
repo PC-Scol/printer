@@ -8,52 +8,87 @@ import fr.opensagres.xdocreport.document.IXDocReport;
 import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
 import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
+import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
+/**
+ * The PrinterService role is to generate documents by merging a template (odt, docx) with a data model.
+ * It uses the XDocReport library to make that.
+ */
 @Service
 public class PrinterService {
 
     private Logger logger = LoggerFactory.getLogger(PrinterService.class);
 
+    /**
+     * report/template registry used to load and cache reports
+     */
     private static XDocReportRegistry reportRegistry = XDocReportRegistry.getRegistry();
 
+    /**
+     * stop watch for generation time calculations
+     */
+    private StopWatch stopWatch = new StopWatch();
+
+    /**
+     * Generates a document by merging the template (odt, docx) referenced by templateUrl with the provided data.
+     * The resulting document may be converted to pdf if convert is set to <code>true</code> and then written to the outputStream.
+     * @param templateUrl the url of the template (odt, docx) to use
+     * @param data the model to merge within the template
+     * @param convert is <code>true</code> if the resulting document need to be converted to pdf
+     * @param outputStream the stream used to write the document
+     * @throws TemplateNotFoundException if the provided url does not reference a valid template
+     * @throws DocumentGenerationException if any error occurs during the document generation
+     */
     public void generate(URL templateUrl, Map<String, Object> data, boolean convert, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {
-        logger.debug("New document generation is requested with template={}, data={}, convert={}", templateUrl, data, convert);
-        IXDocReport templateReport = getTemplateReport(templateUrl);
         try {
-            IContext iContext = templateReport.createContext(data);
-            if(!convert){
-                templateReport.process(iContext, outputStream);
-            }else{
-                templateReport.convert(iContext, Options.getFrom(getDocumentKind(templateUrl.getFile())).to(ConverterTypeTo.PDF), outputStream);
+            if (stopWatch.isRunning()) {
+                stopWatch.stop();
             }
-            logger.debug("New document generated with template {}", templateUrl);
-        } catch (XDocReportException | IOException e) {
-            logger.error("An error occured during document generation.", e);
-            throw new DocumentGenerationException("An error occured during document generation", e);
+            stopWatch.start();
+
+            logger.debug("New document generation is requested with template={}, data={}, convert={}", templateUrl, data, convert);
+            IXDocReport templateReport = getTemplateReport(templateUrl);
+            try {
+                IContext iContext = templateReport.createContext(data);
+                if (!convert) {
+                    templateReport.process(iContext, outputStream);
+                } else {
+                    templateReport.convert(iContext, Options.getFrom(getDocumentKind(templateUrl.getFile())).to(ConverterTypeTo.PDF), outputStream);
+                }
+                logger.debug("New document generated with template {}", templateUrl);
+            } catch (XDocReportException | IOException e) {
+                logger.error("An error occured during document generation.", e);
+                throw new DocumentGenerationException("An error occured during document generation", e);
+            }
+        }finally {
+            stopWatch.stop();
+            long lastExecTime = stopWatch.getLastTaskTimeNanos();
+            long avgExecTime = stopWatch.getTotalTimeNanos() / stopWatch.getTaskCount();
+            logger.debug("Document generation took {} ns, Average generation time is {} ns.", lastExecTime, avgExecTime);
         }
 
     }
 
+    /**
+     * Gets the document kind of the provided file name.
+     * @param fileName the file name
+     * @return the {@link DocumentKind}
+     * @throws DocumentGenerationException if cannot retrieve the document kind
+     */
     private DocumentKind getDocumentKind(String fileName) throws DocumentGenerationException {
-        String mimeType;
-        try {
-            mimeType = Files.probeContentType(Path.of(fileName));
-        } catch (IOException e) {
-            throw new DocumentGenerationException(String.format("Unable to detect the provided template contentType for %s", fileName));
-        }
+        String mimeType = PrinterUtil.getMimeType(fileName);
         if(mimeType == null){
             throw new DocumentGenerationException(String.format("Unable to detect the provided template contentType for %s", fileName));
         }else{
@@ -66,6 +101,12 @@ public class PrinterService {
     }
 
 
+    /**
+     * Gets/Loads the report/template with a given templateUrl.
+     * @param templateUrl the template url
+     * @return the report/template
+     * @throws TemplateNotFoundException if the template cannot be found or loaded
+     */
     private IXDocReport getTemplateReport(URL templateUrl) throws TemplateNotFoundException {
 
         String reportId = String.valueOf(templateUrl.hashCode());

@@ -1,7 +1,6 @@
 plugins {
     id 'java-library'
     id 'maven'
-    id 'maven-publish'
     id 'io.spring.dependency-management'
 }
 
@@ -54,14 +53,4 @@ swaggerCodeGen {
     apiFile = file("${project(':printer-api').projectDir}/yml/printer-api.yml")
     lang = 'java'
     configFile = file('swaggerCodeGenJavaConfig.json')
-}
-
-
-publishing {
-    publications {
-        implementation(MavenPublication) {
-            groupId 'fr.pcscol.printer'
-            artifactId 'printer-adapter'
-        }
-    }
 }

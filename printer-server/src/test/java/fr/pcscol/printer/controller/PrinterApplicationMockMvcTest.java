@@ -2,6 +2,7 @@ package fr.pcscol.printer.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pcscol.printer.PersonBean;
+import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.client.api.model.PrintMessage;
 import fr.pcscol.printer.service.PrinterService;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
@@ -52,9 +53,12 @@ public class PrinterApplicationMockMvcTest {
     @Value("${printer.template.base-url}")
     private String templateBaseUrl;
 
-    private boolean keepFilesEnv = Boolean.valueOf(System.getenv("keepFiles"));
+    private static final boolean keepFilesEnv = Boolean.valueOf(System.getenv("keepFiles"));
 
-    private static final URLStreamHandler urlStreamHandler = TomcatURLStreamHandlerFactory.getInstance().createURLStreamHandler("classpath");
+    static {
+        TomcatURLStreamHandlerFactory.getInstance();
+    }
+
 
     @Test
     public void print_OkTest() throws Exception {
@@ -80,8 +84,7 @@ public class PrinterApplicationMockMvcTest {
                         outputStream.write(generatedBytes);
                         return null;
                     }
-            ).when(printerService).generate(eq(new URL(null, templateBaseUrl + "certificat.odt", TomcatURLStreamHandlerFactory.getInstance().createURLStreamHandler("classpath"))),
-                    eq(map), eq(true), any(OutputStream.class));
+            ).when(printerService).generate(eq(PrinterUtil.completeUrl("certificat.odt", templateBaseUrl)), eq(map), eq(true), any(OutputStream.class));
 
             //invoke WS
             PrintMessage printMessage = new PrintMessage().templateUrl("certificat.odt").data(personBean).convert(true);
@@ -115,7 +118,7 @@ public class PrinterApplicationMockMvcTest {
             String body = objectMapper.writeValueAsString(printMessage);
             mvc.perform(post("/printer/v1/print").contentType(MediaType.APPLICATION_JSON).content(body))
                     .andExpect(status().isBadRequest())
-                    .andExpect(status().reason("Provided URL format is not correct"));
+                    .andExpect(status().reason("Provided URL format is not correct : -|*/"));
 
         }
     }
@@ -135,8 +138,8 @@ public class PrinterApplicationMockMvcTest {
             Map<String, Object> map = objectMapper.convertValue(personBean, Map.class);
 
             //mock printService call
-            doThrow(new TemplateNotFoundException("Template not found")).when(printerService).generate(eq(new URL(null, templateBaseUrl + "unknown.odt", TomcatURLStreamHandlerFactory.getInstance().createURLStreamHandler("classpath"))),
-                    eq(map), eq(true), any(OutputStream.class));
+            doThrow(new TemplateNotFoundException("Template not found")).when(printerService).generate(
+                    eq(PrinterUtil.completeUrl("unknown.odt", templateBaseUrl)), eq(map), eq(true), any(OutputStream.class));
 
             //invoke WS
             PrintMessage printMessage = new PrintMessage().templateUrl("unknown.odt").data(personBean).convert(true);
@@ -163,9 +166,8 @@ public class PrinterApplicationMockMvcTest {
             Map<String, Object> map = objectMapper.convertValue(personBean, Map.class);
 
             //mock printService call
-            URL url = new URL(null, templateBaseUrl + "certificat.odt", urlStreamHandler);
-            doThrow(new DocumentGenerationException("An error occured during document generation")).when(printerService).generate(eq(url),
-                    eq(map), eq(true), any(OutputStream.class));
+            doThrow(new DocumentGenerationException("An error occured during document generation")).when(printerService).generate(
+                    eq(PrinterUtil.completeUrl("certificat.odt", templateBaseUrl)), eq(map), eq(true), any(OutputStream.class));
 
             //invoke WS
             PrintMessage printMessage = new PrintMessage().templateUrl("certificat.odt").data(personBean).convert(true);
