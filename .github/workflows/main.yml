@@ -9,7 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Build
-      run: | 
-        echo Build...
-        ./gradlew build
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - uses: eskatos/gradle-command-action@v1
+      with:
+        arguments: build
