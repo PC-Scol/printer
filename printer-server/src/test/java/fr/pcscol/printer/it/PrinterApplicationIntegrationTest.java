@@ -11,12 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Tests the client/server integration by invoking the real WS.
@@ -31,14 +31,14 @@ public class PrinterApplicationIntegrationTest {
     @Autowired
     private PrinterApi printerApi;
 
-    private boolean keepFilesEnv = Boolean.valueOf(System.getenv("keepFiles"));
+    private Boolean keepFilesEnv = Boolean.valueOf(System.getenv("keepFiles"));
 
     /**
      * Tests the client/server integration by invoking the real WS.
-     * @throws Exception
+     * @throws IOException
      */
     @Test
-    public void print_OKTest() throws Exception {
+    public void print_OKTest() throws IOException {
 
         File outFile = File.createTempFile("PrinterApplicationIntegrationTest_out_", ".pdf", new File("build"));
         if(!keepFilesEnv) {
