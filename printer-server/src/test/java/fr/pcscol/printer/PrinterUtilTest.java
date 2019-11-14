@@ -3,7 +3,6 @@ package fr.pcscol.printer;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.http.MediaType;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -84,7 +83,7 @@ public class PrinterUtilTest {
             PrinterUtil.extractOutputFileName("/test", null,true);
             Assert.fail();
         } catch (IllegalArgumentException e) {
-
+            //success
         }
     }
 }

@@ -1,5 +1,8 @@
 package fr.pcscol.printer;
 
+import com.fasterxml.classmate.TypeResolver;
+import fr.pcscol.printer.api.model.ImageFieldMetadata;
+import fr.pcscol.printer.api.model.TextStylingFieldMetadata;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -20,9 +23,11 @@ public class PrinterApplication {
         SpringApplication.run(PrinterApplication.class, args);
     }
 
-
     @Bean
     public Docket api() {
+
+        TypeResolver typeResolver = new TypeResolver();
+
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("v1")
                 .apiInfo(new ApiInfo(
@@ -37,6 +42,7 @@ public class PrinterApplication {
                 ))
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("fr.pcscol.printer.controller"))
-                .build().tags(new Tag("printer", "The printer resource"));
+                .build().tags(new Tag("printer", "The printer resource"))
+                .additionalModels(typeResolver.resolve(ImageFieldMetadata.class), typeResolver.resolve(TextStylingFieldMetadata.class));
     }
 }

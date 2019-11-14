@@ -2,6 +2,7 @@ package fr.pcscol.printer.controller;
 
 import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.PrinterApi;
+import fr.pcscol.printer.api.model.FieldMetadata;
 import fr.pcscol.printer.api.model.PrintMessage;
 import fr.pcscol.printer.service.PrinterService;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
@@ -22,14 +23,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/printer/v1")
 public class PrinterController implements PrinterApi {
-
-    @Autowired
-    private ServletContext servletContext;
 
     @Autowired
     private PrinterService printerService;
@@ -51,13 +50,17 @@ public class PrinterController implements PrinterApi {
 
         //data to print
         Map<String, Object> data = (Map<String, Object>) body.getData();
+
+        //metadata about data fields
+        List<FieldMetadata> fieldMetadataList = body.getFieldsMetadata();
+
         //is pdf conversion requested
-        boolean convert = body.isConvert();
+        boolean convert = Boolean.TRUE.equals(body.isConvert());
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             try {
                 //invoke generation
-                printerService.generate(templateUrl, data, convert, outputStream);
+                printerService.generate(templateUrl, data, fieldMetadataList, convert, outputStream);
                 //success response
                 byte[] content = outputStream.toByteArray();
                 //extract output file name
@@ -66,7 +69,7 @@ public class PrinterController implements PrinterApi {
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))
                         // Content-Type
-                        .contentType(convert == true ? MediaType.APPLICATION_PDF : MediaType.valueOf(PrinterUtil.getMimeType(templateUrl.getFile())))
+                        .contentType(convert ? MediaType.APPLICATION_PDF : MediaType.valueOf(PrinterUtil.getMimeType(templateUrl.getFile())))
                         .contentLength(content.length)
                         .body(content);
             } catch (TemplateNotFoundException e) {
