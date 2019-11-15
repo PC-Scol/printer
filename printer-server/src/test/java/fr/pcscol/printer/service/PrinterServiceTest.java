@@ -9,6 +9,7 @@ import fr.pcscol.printer.api.model.ImageFieldMetadata;
 import fr.pcscol.printer.api.model.TextStylingFieldMetadata;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
+import org.apache.xerces.impl.dv.util.Base64;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,10 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -146,6 +144,7 @@ public class PrinterServiceTest {
 
     /**
      * Tests generation with metadata fields
+     *
      * @throws IOException
      */
     @Test
@@ -157,6 +156,7 @@ public class PrinterServiceTest {
         URL templateUrl = this.getClass().getResource("/template_metadata.odt");
         //data
         Map<String, Object> map = new HashMap<>();
+        map.put("o1", new HashMap<>());
         map.put("logo", new ClassPathImageProvider(PrinterServiceTest.class, "/logo.gif"));
         map.put("items", Lists.newArrayList("item1", "item2", "item3"));
         map.put("url", "http://google.com");
@@ -179,10 +179,51 @@ public class PrinterServiceTest {
     }
 
     /**
+     * Tests generation with metadata fields
+     *
+     * @throws IOException
+     */
+    @Test
+    public void generateWithFieldsMetadataForNestedImageBase64Test() throws IOException {
+        File outFile = File.createTempFile("metadata_nesting_out_", ".odt", new File("build"));
+        outFile.deleteOnExit();
+
+        //templateUrl
+        URL templateUrl = this.getClass().getResource("/template_metadata_nesting.odt");
+        //data
+        String image;
+        try (InputStream inputStream = this.getClass().getResourceAsStream("/logo.gif")) {
+            image = Base64.encode(inputStream.readAllBytes());
+        }
+        PrinterContext printerContext = new PrinterContext();
+        printerContext.put("o1.o2.logo", image);
+        printerContext.put("items", Lists.newArrayList("item1", "item2", "item3"));
+        printerContext.put("o1.items", Lists.newArrayList("item1", "item2", "item3"));
+        printerContext.put("o1.url", "http://google.com");
+        printerContext.put("o1.link", "<a href=\"${o1.url}\">Google</a> ");
+
+        //metadata
+        List<FieldMetadata> fieldMetadataList = new ArrayList<>();
+        fieldMetadataList.add(new FieldMetadata().fieldName("items").listType(true));
+        fieldMetadataList.add(new FieldMetadata().fieldName("o1.items").listType(true));
+        fieldMetadataList.add(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.KEEPIMAGETEMPLATE).fieldName("o1.o2.logo"));
+        fieldMetadataList.add(new TextStylingFieldMetadata().syntaxKind(TextStylingFieldMetadata.SyntaxKindEnum.HTML).syntaxWithDirective(true).fieldName("o1.link"));
+
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
+            try {
+                printerService.generate(templateUrl, printerContext.getContextMap(), fieldMetadataList, false, outputStream);
+                Assert.assertThat(outFile.length(), Matchers.greaterThan(0L));
+            } catch (Exception e) {
+                Assert.fail(e.getMessage());
+            }
+        }
+    }
+
+    /**
      * Tests generation with metadata fields error : expected list is not
      */
     @Test
-    public void generateWithFieldsMetadataNotListErrorTest(){
+    public void generateWithFieldsMetadataNotListErrorTest() {
 
         //templateUrl
         URL templateUrl = this.getClass().getResource("/template_metadata.odt");
@@ -197,13 +238,14 @@ public class PrinterServiceTest {
         fieldMetadataList.add(new FieldMetadata().fieldName("items").listType(true));
         fieldMetadataList.add(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.KEEPIMAGETEMPLATE).fieldName("logo"));
 
-            try {
-                printerService.generate(templateUrl, map, fieldMetadataList, false, null);
-            } catch (DocumentGenerationException e) {
-                //success
-            } catch (Exception e){
-                Assert.fail("Should throw DocumentGenerationException");
-            }
+        try {
+            printerService.generate(templateUrl, map, fieldMetadataList, false, null);
+            Assert.fail("Should throw DocumentGenerationException");
+        } catch (DocumentGenerationException e) {
+            //success
+        } catch (Exception e) {
+            Assert.fail("Should throw DocumentGenerationException");
+        }
 
     }
 
@@ -227,11 +269,42 @@ public class PrinterServiceTest {
 
         try {
             printerService.generate(templateUrl, map, fieldMetadataList, false, null);
+            Assert.fail("Should throw DocumentGenerationException");
         } catch (DocumentGenerationException e) {
             //success
-        } catch (Exception e){
+        } catch (Exception e) {
             Assert.fail("Should throw DocumentGenerationException");
         }
+
+    }
+
+    /**
+     * Tests generation with metadata fields error : image badly encoded
+     */
+    @Test
+    public void generateWithFieldsMetadataImageBadlyEncodedErrorTest() {
+
+        //templateUrl
+        URL templateUrl = this.getClass().getResource("/template_metadata.odt");
+        //data
+        PrinterContext printerContext = new PrinterContext();
+        printerContext.put("logo", new Object());
+        printerContext.put("items", Lists.newArrayList("item1", "item2", "item3"));
+
+        //metadata
+        List<FieldMetadata> fieldMetadataList = new ArrayList<>();
+        fieldMetadataList.add(new FieldMetadata().fieldName("items").listType(true));
+        fieldMetadataList.add(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.THROWSERROR).fieldName("logo"));
+
+        try {
+            printerService.generate(templateUrl, printerContext.getContextMap(), fieldMetadataList, false, null);
+            Assert.fail("Should throw DocumentGenerationException");
+        } catch (DocumentGenerationException e) {
+            //success
+        } catch (Exception e) {
+            Assert.fail("Should throw DocumentGenerationException");
+        }
+
 
     }
 }
