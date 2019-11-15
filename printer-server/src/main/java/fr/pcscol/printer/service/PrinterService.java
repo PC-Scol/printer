@@ -75,11 +75,15 @@ public class PrinterService {
         logger.debug("New document generation is requested with template={}, data={}, convert={}", templateUrl, data, convert);
         IXDocReport templateReport = getTemplateReport(templateUrl);
         try {
-            IContext iContext = templateReport.createContext(data);
+            //build context
+            PrinterContext iContext = new PrinterContext(data);
+            //add metadata
             if(fieldMetadataList != null) {
                 FieldsMetadata reportFieldsMetadata = templateReport.createFieldsMetadata();
                 fillReportFieldsMetadata(fieldMetadataList, reportFieldsMetadata);
+                iContext.setupImages(reportFieldsMetadata);
             }
+
             if (!convert) {
                 templateReport.process(iContext, outputStream);
             } else {
