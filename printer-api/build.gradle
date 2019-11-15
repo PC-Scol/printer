@@ -6,8 +6,6 @@ plugins {
 }
 
 
-project.version= "0.0.1-SNAPSHOT"
-
 dependencyManagement {
     imports {
         mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"

@@ -10,3 +10,7 @@ allprojects {
 }
 
 group 'fr.pcscol.printer'
+
+subprojects {
+    version = rootProject.version
+}
