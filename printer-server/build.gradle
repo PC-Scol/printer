@@ -4,6 +4,7 @@ plugins {
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
     id 'jacoco'
+    id 'com.google.cloud.tools.jib'
 }
 
 
@@ -41,4 +42,33 @@ test {
 
 bootJar {
     mainClassName = 'fr.pcscol.printer.PrinterApplication'
+}
+
+
+def imageName = rootProject.name
+
+jib {
+    from {
+        image = "openjdk:11-jdk"
+    }
+    to {
+        image = "${deliveryImageRepository}/${imageName}:${rootProject.version}"
+        auth {
+            username = project.findProperty("dockerUsername") ?: System.getenv("DOCKER_USERNAME")
+            password = project.findProperty("dockerPassword") ?: System.getenv("DOCKER_PASSWORD")
+        }
+    }
+    container {
+        useCurrentTimestamp = true
+        format = 'Docker'
+        labels = [
+                'fr.pc-scol.vendor': 'PC-SCOL',
+                'fr.pc-scol.app'   : 'PEGASE',
+                'fr.pc-scol.module': 'printer-server',
+                version            : rootProject.version
+        ]
+        ports = ['8080/tcp']
+        jvmFlags = ['-Djava.security.egd=file:/dev/./urandom']
+        user = 'java'
+    }
 }

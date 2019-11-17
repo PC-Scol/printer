@@ -3,6 +3,7 @@ plugins {
     id 'maven'
     id 'maven-publish'
     id 'io.spring.dependency-management'
+    id 'signing'
 }
 
 
@@ -65,19 +66,33 @@ swaggerCodeGen {
     configFile = file('swaggerCodeGenSpringConfig.json')
 }
 
-def apiFile = file("$buildDir/swagger/printer-api.yml")
+def apiFile = file("${project(':printer-api').buildDir}/swagger/printer-api.yml")
 def apiArtifact = artifacts.add("apiArtifact", apiFile) {
     type "yml"
     builtBy swaggerAggregateFiles
 }
 
+//signing {
+//    sign configurations.archives
+//}
+
 publishing {
     publications {
         api(MavenPublication) {
-            groupId 'fr.pcscol.printer'
+            groupId 'fr.pcscol'
             artifactId 'printer-api'
             artifact apiArtifact
-            from components.java
         }
     }
+//    repositories {
+//        maven {
+//            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+//            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+//            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+//            credentials {
+//                username ossrhUserName
+//                password ossrhPassword
+//            }
+//        }
+//    }
 }
