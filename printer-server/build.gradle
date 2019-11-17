@@ -45,19 +45,20 @@ bootJar {
 }
 
 
-def imageName = rootProject.name
+def imageName = project.name
 
 jib {
     from {
-        image = "openjdk:11-jdk"
+        image = "${baseImageName}:${baseImageTag}"
     }
     to {
-        image = "${deliveryImageRepository}/${imageName}:${rootProject.version}"
+        image = "${deliveryImageRegistry}/${deliveryImageRepository}/${imageName}:${rootProject.version}"
         auth {
-            username = project.findProperty("dockerUsername") ?: System.getenv("DOCKER_USERNAME")
-            password = project.findProperty("dockerPassword") ?: System.getenv("DOCKER_PASSWORD")
+            username = System.getenv('dockerUsername')
+            password = System.getenv('dockerPassword')
         }
     }
+
     container {
         useCurrentTimestamp = true
         format = 'Docker'

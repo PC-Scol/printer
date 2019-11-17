@@ -3,40 +3,28 @@ name: CI
 on: [push]
 
 jobs:
-  init:
+  build:
+    env:
+      dockerUsername: ${{ secrets.DOCKER_USERNAME }}
+      dockerPassword: ${{ secrets.DOCKER_PASSWORD }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v1
       - name: SetupJava
         uses: actions/setup-java@v1
-          with:
-            java-version: 11
-  test:
-    runs-on: ubuntu-latest
-    needs: init
-    steps:
+        with:
+          java-version: 11
       - name: Test
         uses: eskatos/gradle-command-action@v1
-          with:
-            arguments: test
-
-  build:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
+        with:
+          arguments: test
       - name: Build
         uses: eskatos/gradle-command-action@v1
         with:
           arguments: build
-
-  buildImage:
-    needs: build
-    env:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-    steps:
-      - name: Jib
+      - name: Build & deploy image
         uses: eskatos/gradle-command-action@v1
-          with:
-            arguments: jib
+        with:
+          arguments: jib
+
