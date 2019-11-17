@@ -1,0 +1,53 @@
+plugins {
+    id 'java-library'
+    id 'maven'
+    id 'io.spring.dependency-management'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+    }
+}
+
+configurations {
+    swaggerCodegen // Exécutable Swagger codegen-cli
+}
+
+dependencies {
+    // Add dependency for Swagger Codegen CLI
+    swaggerCodegen(group: 'io.swagger.codegen.v3', name: 'swagger-codegen-cli', version: "${swaggerCodegenCli3Version}") {
+        transitive = false
+    }
+
+    // Compilation des classes java générées par swagger
+    compileOnly 'javax.servlet:javax.servlet-api'
+    compileOnly 'javax.validation:validation-api'
+    compileOnly 'org.slf4j:slf4j-api'
+    compileOnly "io.swagger:swagger-annotations:${swaggerAnnotationsVersion}"
+    compileOnly "io.swagger.core.v3:swagger-annotations:${swaggerCoreAnnotationsVersion}"
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind'
+    compileOnly 'org.springframework:spring-core'
+    compileOnly 'org.springframework:spring-webmvc'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$project.buildDir/generated/src/main/java"
+        }
+    }
+}
+
+task("swaggerCodeGen", type: SwaggerCodeGenTaskV3) {
+    group 'Source Generation'
+    description 'Génère les sources de l\'API à partir du fichier yml.'
+}
+
+compileJava.dependsOn swaggerCodeGen
+
+swaggerCodeGen {
+    apiFile = file("${project(':printer-api').projectDir}/yml/printer-api.yml")
+    lang = 'java'
+    configFile = file('swaggerCodeGenJavaConfig.json')
+}

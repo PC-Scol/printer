@@ -1,0 +1,98 @@
+plugins {
+    id 'java'
+    id 'maven'
+    id 'maven-publish'
+    id 'io.spring.dependency-management'
+    id 'signing'
+}
+
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+    }
+}
+
+configurations {
+    apiArtifact // Artefact de l'API
+    swaggerCodegen // Exécutable Swagger codegen-cli
+}
+
+dependencies {
+    // Add dependency for Swagger Codegen CLI
+    swaggerCodegen(group: 'io.swagger.codegen.v3', name: 'swagger-codegen-cli', version: "${swaggerCodegenCli3Version}") {
+        transitive = false
+    }
+
+    // Compilation des classes java générées par swagger
+    compileOnly 'javax.servlet:javax.servlet-api'
+    compileOnly 'javax.validation:validation-api'
+    compileOnly 'org.slf4j:slf4j-api'
+    compileOnly "io.swagger:swagger-annotations:${swaggerAnnotationsVersion}"
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind'
+    compileOnly 'org.springframework:spring-webmvc'
+
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$project.buildDir/generated/src/main/java"
+        }
+    }
+}
+
+task("swaggerAggregateFiles", type: SwaggerAggregateFiles) {
+    group 'Source Generation'
+    description 'Aggrège les différents fichiers yml de description d\'API en un seul.'
+}
+
+
+task("swaggerCodeGen", type: SwaggerCodeGenTaskV3) {
+    group 'Source Generation'
+    description 'Génère les sources de l\'API à partir du fichier yml.'
+}
+
+swaggerCodeGen.dependsOn swaggerAggregateFiles
+compileJava.dependsOn swaggerCodeGen
+
+swaggerAggregateFiles {
+    apiFiles = fileTree(dir: 'yml', includes: ['**/*.yml'])
+    output = file("$buildDir/swagger/printer-api.yml")
+}
+swaggerCodeGen {
+    apiFile = file("${project(':printer-api').projectDir}/yml/printer-api.yml")
+    lang = 'spring'
+    configFile = file('swaggerCodeGenSpringConfig.json')
+}
+
+def apiFile = file("${project(':printer-api').buildDir}/swagger/printer-api.yml")
+def apiArtifact = artifacts.add("apiArtifact", apiFile) {
+    type "yml"
+    builtBy swaggerAggregateFiles
+}
+
+//signing {
+//    sign configurations.archives
+//}
+
+publishing {
+    publications {
+        api(MavenPublication) {
+            groupId 'fr.pcscol'
+            artifactId 'printer-api'
+            artifact apiArtifact
+        }
+    }
+//    repositories {
+//        maven {
+//            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+//            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+//            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+//            credentials {
+//                username ossrhUserName
+//                password ossrhPassword
+//            }
+//        }
+//    }
+}

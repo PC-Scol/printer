@@ -1,0 +1,75 @@
+plugins {
+    id 'java'
+    id 'maven'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'jacoco'
+    id 'com.google.cloud.tools.jib'
+}
+
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+    }
+}
+
+dependencies {
+
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+    implementation project(':printer-api')
+    testImplementation project(':client:printer-adapter')
+
+    //xdocreport
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xDocReportVersion}")
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xDocReportVersion}")
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}")
+
+    // Swagger
+    implementation "io.springfox:springfox-swagger2:${springfoxSwagger2Version}"
+    runtimeOnly "io.springfox:springfox-swagger-ui:${springfoxSwaggerUiVersion}"
+
+}
+
+test {
+    useJUnit()
+}
+
+bootJar {
+    mainClassName = 'fr.pcscol.printer.PrinterApplication'
+}
+
+
+def imageName = project.name
+
+jib {
+    from {
+        image = "${baseImageName}:${baseImageTag}"
+    }
+    to {
+        image = "${deliveryImageRegistry}/${deliveryImageRepository}/${imageName}:${rootProject.version}"
+        auth {
+            username = System.getenv('dockerUsername')
+            password = System.getenv('dockerPassword')
+        }
+    }
+
+    container {
+        useCurrentTimestamp = true
+        format = 'Docker'
+        labels = [
+                'fr.pc-scol.vendor': 'PC-SCOL',
+                'fr.pc-scol.app'   : 'PEGASE',
+                'fr.pc-scol.module': 'printer-server',
+                version            : rootProject.version
+        ]
+        ports = ['8080/tcp']
+        jvmFlags = ['-Djava.security.egd=file:/dev/./urandom']
+        user = 'java'
+    }
+}
