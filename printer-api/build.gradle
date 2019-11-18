@@ -73,8 +73,8 @@ def apiArtifact = artifacts.add("apiArtifact", apiFile) {
 }
 
 signing {
-    def signingKey = findProperty("signingKey")
-    def signingPassword = findProperty("signingPassword")
+    def signingKey = findProperty('signingKey') ?: System.getenv("signingKey")
+    def signingPassword = findProperty('signingPassword') ?: System.getenv("signingPassword")
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign configurations.archives
 }
