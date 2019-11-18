@@ -5,10 +5,10 @@ on: [push]
 jobs:
   build:
     env:
-      dockerUsername: ${{ secrets.DOCKER_USERNAME }}
-      dockerPassword: ${{ secrets.DOCKER_PASSWORD }}
-      signingKey: ${{ secrets.GPG_KEY }}
-      signingPassword: ${{ secrets.GPG_PASSWORD }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,7 +24,7 @@ jobs:
       - name: Build
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: build
+          arguments: build -PdockerUsername=$DOCKER_USERNAME -PdockerPassword=$DOCKER_PASSWORD -PsigningKey=$GPG_KEY -PsigningPassword=$GPG_PASSWORD
       - name: Build & deploy image
         uses: eskatos/gradle-command-action@v1
         with:
