@@ -7,6 +7,8 @@ jobs:
     env:
       dockerUsername: ${{ secrets.DOCKER_USERNAME }}
       dockerPassword: ${{ secrets.DOCKER_PASSWORD }}
+      signingKey: ${{ secrets.GPG_KEY }}
+      signingPassword: ${{ secrets.GPG_PASSWORD }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
