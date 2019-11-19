@@ -23,7 +23,6 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 
     implementation project(':printer-api')
-    testImplementation project(':client:printer-adapter')
 
     //xdocreport
     implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xDocReportVersion}")

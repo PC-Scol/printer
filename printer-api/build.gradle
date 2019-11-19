@@ -61,12 +61,12 @@ swaggerAggregateFiles {
     output = file("$buildDir/swagger/printer-api.yml")
 }
 swaggerCodeGen {
-    apiFile = file("${project(':printer-api').projectDir}/yml/printer-api.yml")
+    apiFile = file("${projectDir}/yml/printer-api.yml")
     lang = 'spring'
     configFile = file('swaggerCodeGenSpringConfig.json')
 }
 
-def apiFile = file("${project(':printer-api').buildDir}/swagger/printer-api.yml")
+def apiFile = file("${buildDir}/swagger/printer-api.yml")
 def apiArtifact = artifacts.add("apiArtifact", apiFile) {
     type "yml"
     builtBy swaggerAggregateFiles
@@ -82,7 +82,7 @@ signing {
 publishing {
     publications {
         api(MavenPublication) {
-            groupId 'fr.pcscol'
+            groupId 'fr.pcscol.printer'
             artifactId 'printer-api'
             artifact apiArtifact
         }

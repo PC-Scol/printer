@@ -1,18 +1,15 @@
-package fr.pcscol.printer.it;
+package fr.pcscol.printer.integration.test;
 
-import fr.pcscol.printer.PersonBean;
 import fr.pcscol.printer.adapter.PrinterException;
 import fr.pcscol.printer.client.api.PrinterApi;
 import fr.pcscol.printer.client.api.model.PrintMessage;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.BufferedOutputStream;
@@ -21,28 +18,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * Tests the client/server integration by invoking the real WS.
+ * Tests the client/server integration
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@EnableAutoConfiguration
+@SpringBootTest(classes = PrinterApplicationTestConfiguration.class)
 public class PrinterApplicationIntegrationTest {
-
-
-    @LocalServerPort
-    private int port;
-
-    @Value("${printer.api.base-path}")
-    private String basePath;
 
     @Autowired
     private PrinterApi printerApi;
 
     private Boolean keepFilesEnv = Boolean.valueOf(System.getenv("keepFiles"));
-
-    @Before
-    public void setup() {
-        printerApi.getApiClient().setBasePath(String.format(basePath, port));
-    }
 
     /**
      * Tests the client/server integration by invoking the real WS.

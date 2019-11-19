@@ -34,6 +34,13 @@ public class PrinterUtilTest {
             Assert.fail();
         }
 
+        try {
+            result = PrinterUtil.completeUrl("/test.txt", "classpath:/");
+            Assert.assertEquals(new URL("classpath:/test.txt"), result);
+        } catch (MalformedURLException e) {
+            Assert.fail();
+        }
+
         //Test with file schema
         try {
             result = PrinterUtil.completeUrl("test.txt", "file://path/to/baseDir");
@@ -80,7 +87,7 @@ public class PrinterUtilTest {
         Assert.assertEquals("test_0000.pdf", PrinterUtil.extractOutputFileName("/test.txt", "0000", true));
 
         try {
-            PrinterUtil.extractOutputFileName("/test", null,true);
+            PrinterUtil.extractOutputFileName("/test", null, true);
             Assert.fail();
         } catch (IllegalArgumentException e) {
             //success

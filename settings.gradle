@@ -1,8 +1,8 @@
 rootProject.name = 'printer'
 
 include ':printer-api'
-include ':client:printer-adapter'
 include ':printer-server'
+include ':integration-test'
 
 buildscript {
     repositories {
@@ -12,6 +12,7 @@ buildscript {
     }
     dependencies {
         classpath 'gradle.plugin.net.vivin:gradle-semantic-build-versioning:4.0.0'
+        classpath "com.avast.gradle:gradle-docker-compose-plugin:0.10.4"
     }
 }
 

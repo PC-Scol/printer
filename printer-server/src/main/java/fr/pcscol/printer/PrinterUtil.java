@@ -1,5 +1,7 @@
 package fr.pcscol.printer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -12,13 +14,14 @@ import java.nio.file.Path;
 
 public final class PrinterUtil {
 
+    private static Logger logger = LoggerFactory.getLogger(PrinterUtil.class);
 
-    public static final String SLASH = "/";
+    private static final String SLASH = "/";
     private static final String EMPTY = "";
     private static final String DOT = ".";
-    public static final String UNDERSCORE = "_";
+    private static final String UNDERSCORE = "_";
 
-    public static final URL completeUrl(String templateUrl, String templateBaseUrl) throws MalformedURLException {
+    public static final URL completeUrl(final String templateUrl, final String templateBaseUrl) throws MalformedURLException {
         URI uri;
         try {
             uri = new URI(templateUrl);
@@ -28,8 +31,12 @@ public final class PrinterUtil {
         if (uri.isAbsolute()) {
             return new URL(templateUrl);
         } else {
+            String temp = templateUrl;
             String sep = templateBaseUrl.endsWith(SLASH) ? EMPTY : SLASH;
-            return new URL(templateBaseUrl.concat(sep).concat(templateUrl));
+            if (templateUrl.startsWith(SLASH)) {
+                temp = templateUrl.substring(1);
+            }
+            return new URL(templateBaseUrl.concat(sep).concat(temp));
         }
     }
 
@@ -57,8 +64,8 @@ public final class PrinterUtil {
             fileName = originalPath.substring(slashIndex + 1, dotIndex);
         }
 
-        StringBuilder sb =  new StringBuilder().append(fileName);
-        if(!StringUtils.isEmpty(suffix)){
+        StringBuilder sb = new StringBuilder().append(fileName);
+        if (!StringUtils.isEmpty(suffix)) {
             sb.append(UNDERSCORE).append(suffix);
         }
         return sb.append(DOT).append(convert == true ? "pdf" : ext).toString();

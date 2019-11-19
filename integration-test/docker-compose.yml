@@ -1,0 +1,8 @@
+version: "3"
+services:
+  printer-server:
+    image: pcscol/printer-server
+    ports:
+      - "8080:8080"
+    hostname: printer-server
+    user: root

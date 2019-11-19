@@ -1,7 +1,8 @@
 plugins {
-    id 'java-library'
+    id 'java'
     id 'maven'
     id 'io.spring.dependency-management'
+    id "com.avast.gradle.docker-compose" version "0.10.4"
 }
 
 dependencyManagement {
@@ -31,6 +32,10 @@ dependencies {
     compileOnly 'org.springframework:spring-webmvc'
 
     compileOnly 'org.springframework.boot:spring-boot-starter'
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.springframework:spring-web'
+    testCompile 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 sourceSets {
@@ -53,3 +58,5 @@ swaggerCodeGen {
     lang = 'java'
     configFile = file('swaggerCodeGenJavaConfig.json')
 }
+
+dockerCompose.isRequiredBy(test)
