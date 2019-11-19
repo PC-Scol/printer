@@ -57,28 +57,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Unexpected error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 
 
 components:
   schemas:
     Error:
       type: object
-      required:
-        - code
-        - message
       properties:
-        code:
+        timestamp:
           type: string
-          description: The Http error code
+          format: date
+        status:
+          type: int
+        error:
+          type: string
         message:
           type: string
-          description: The error reason
+        path:
+          type: string
     PrintMessage:
       type: object
       required:
@@ -99,10 +95,10 @@ components:
           description: Metadata about how to manage data model fields.
           items:
             $ref: '#/components/schemas/FieldMetadata'
-#            oneOf:
-#              - $ref: '#/components/schemas/FieldMetadata'
-#              - $ref: '#/components/schemas/ImageFieldMetadata'
-#              - $ref: '#/components/schemas/TextStylingFieldMetadata'
+    #            oneOf:
+    #              - $ref: '#/components/schemas/FieldMetadata'
+    #              - $ref: '#/components/schemas/ImageFieldMetadata'
+    #              - $ref: '#/components/schemas/TextStylingFieldMetadata'
     FieldMetadata:
       type: object
       required:
