@@ -11,22 +11,36 @@ jobs:
       signingPassword: ${{ secrets.GPG_PASSWORD }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Sources
         uses: actions/checkout@v1
-      - name: SetupJava
+
+      - name: Setup Java
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Test
+
+      - name: Build Printer API
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: test
-      - name: Build
+          arguments: :printer-api:build
+
+      - name: Build Printer Server
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: build
-      - name: Build & deploy image
+          arguments: :printer-server:build
+
+      - name: Build Docker Image
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: jib
+          arguments: :printer-server:jibDockerBuild
+
+      - name: Run Integration Tests
+          uses: eskatos/gradle-command-action@v1
+          with:
+            arguments: :integration-test:build
+
+      - name: Push Docker Image
+          uses: eskatos/gradle-command-action@v1
+          with:
+            arguments: :printer-server:jib
 
