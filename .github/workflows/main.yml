@@ -35,12 +35,12 @@ jobs:
           arguments: :printer-server:jibDockerBuild
 
       - name: Run Integration Tests
-          uses: eskatos/gradle-command-action@v1
-          with:
-            arguments: :integration-test:build
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :integration-test:build
 
       - name: Push Docker Image
-          uses: eskatos/gradle-command-action@v1
-          with:
-            arguments: :printer-server:jib
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :printer-server:jib
 
