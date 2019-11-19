@@ -30,9 +30,7 @@ dependencies {
     compileOnly 'org.springframework:spring-core'
     compileOnly 'org.springframework:spring-webmvc'
 
-//    compileOnly 'org.springframework.boot:spring-boot-starter'
-//    testCompile 'org.springframework.boot:spring-boot-starter-test'
-//    testCompile 'org.springframework:spring-web'
+    compileOnly 'org.springframework.boot:spring-boot-starter'
 }
 
 sourceSets {
