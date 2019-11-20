@@ -75,7 +75,7 @@ or a [Input-field in OpenOffice](https://wiki.openoffice.org/wiki/Documentation/
 ## How to generate a client for the API
 
 You can easily generate any type of client for the API by passing the YAML definition to the [SwaggerCodegen](https://github.com/swagger-api/swagger-codegen) plugin.
-The YAML definition is released to mavenCentral under the arfifact : __fr.pcscol:printer-api:$VERSION__
+The YAML definition is released to mavenCentral under the arfifact : __fr.pcscol.printer:printer-api:$VERSION__
 
 ## How to build the sources 
  
