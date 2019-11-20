@@ -1,7 +1,6 @@
 package fr.pcscol.printer.adapter;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,7 +16,6 @@ public class PrinterRestTemplate {
         restTemplate = restTemplateBuilder
                 .errorHandler(handler)
                 .build();
-        restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(restTemplate.getRequestFactory()));
     }
 
     public RestTemplate getRestTemplate() {
