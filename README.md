@@ -19,7 +19,7 @@ docker pull pcscol/printer-server
 ```
 Run the image :
 ```
-docker run -u root pcscol/printer-server
+docker run -u root -e printer.template.base-url=$TEMPLATE_BASE_URL pcscol/printer-server
 ```
 
 ## How to use
@@ -34,7 +34,7 @@ You can use it to try the WS :
   // 1 : Tell if the generated document must be converted to pdf or just keep the template format  
   "convert": true,
 
-  // 2 : The path of the template. It can be absolute (http://path, file://path ...) or relative (it will then be completed with the base path)  
+  // 2 : The path of the template. It can be absolute or relative, if so it will be prefixed with the value of $TEMPLATE_BASE_URL. default is 'classpath:/'  
   "templateUrl": "classpath:/certificat.odt"   
 
   // 3 : The data to merge within the document  
@@ -75,7 +75,7 @@ or a [Input-field in OpenOffice](https://wiki.openoffice.org/wiki/Documentation/
 ## How to generate a client for the API
 
 You can easily generate any type of client for the API by passing the YAML definition to the [SwaggerCodegen](https://github.com/swagger-api/swagger-codegen) plugin.
-The YAML definition is released to mavenCentral under the arfifact : __fr.pcscol:printer-api:$VERSION__
+The YAML definition is released to mavenCentral under the arfifact : __fr.pcscol.printer:printer-api:$VERSION__
 
 ## How to build the sources 
  
