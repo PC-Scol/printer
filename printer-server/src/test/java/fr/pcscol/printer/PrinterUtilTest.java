@@ -70,7 +70,6 @@ public class PrinterUtilTest {
     @Test
     public void getMimeTypeTest() {
 
-        Assert.assertEquals("text/plain", PrinterUtil.getMimeType("test.txt"));
         Assert.assertEquals("application/vnd.oasis.opendocument.text", PrinterUtil.getMimeType("test.odt"));
         Assert.assertEquals("application/vnd.openxmlformats-officedocument.wordprocessingml.document", PrinterUtil.getMimeType("test.docx"));
         Assert.assertEquals("application/msword", PrinterUtil.getMimeType("test.doc"));

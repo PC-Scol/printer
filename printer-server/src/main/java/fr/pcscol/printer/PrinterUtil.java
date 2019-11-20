@@ -4,17 +4,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.HashMap;
 
 public final class PrinterUtil {
 
     private static Logger logger = LoggerFactory.getLogger(PrinterUtil.class);
+
+    public static final HashMap<String, String> mimeMap;
+
+    static {
+        mimeMap = new HashMap<>();
+        mimeMap.put("pdf", "application/pdf");
+        mimeMap.put("odt", "application/vnd.oasis.opendocument.text");
+        mimeMap.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        mimeMap.put("doc", "application/msword");
+    }
 
     private static final String SLASH = "/";
     private static final String EMPTY = "";
@@ -41,11 +49,13 @@ public final class PrinterUtil {
     }
 
     public static final String getMimeType(String fileName) {
-        try {
-            return Files.probeContentType(Path.of(fileName));
-        } catch (IOException e) {
-            return null;
-        }
+        /**
+         *  Files.probeContentType method uses mapping files not present on distroless/java image.
+         *  So we need to resolve the mimeType manually
+         */
+        String ext = fileName.substring(fileName.lastIndexOf(DOT) + 1);
+        return mimeMap.get(ext);
+
     }
 
     public static String extractOutputFileName(String originalPath, String suffix, boolean convert) {
