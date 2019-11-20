@@ -6,7 +6,6 @@ import fr.opensagres.xdocreport.core.XDocReportException;
 import fr.opensagres.xdocreport.core.document.DocumentKind;
 import fr.opensagres.xdocreport.document.IXDocReport;
 import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
-import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
 import fr.opensagres.xdocreport.template.formatter.NullImageBehaviour;
@@ -46,10 +45,10 @@ public class PrinterService {
      * Generates a document by merging the template (odt, docx) referenced by templateUrl with the provided data.
      * The resulting document may be converted to pdf if convert is set to <code>true</code> and then written to the outputStream.
      *
-     * @param templateUrl       the url of the template (odt, docx) to use
-     * @param data              the model to merge within the template
-     * @param convert           is <code>true</code> if the resulting document need to be converted to pdf
-     * @param outputStream      the stream used to write the document
+     * @param templateUrl  the url of the template (odt, docx) to use
+     * @param data         the model to merge within the template
+     * @param convert      is <code>true</code> if the resulting document need to be converted to pdf
+     * @param outputStream the stream used to write the document
      * @throws TemplateNotFoundException   if the provided url does not reference a valid template
      * @throws DocumentGenerationException if any error occurs during the document generation
      */
@@ -78,7 +77,7 @@ public class PrinterService {
             //build context
             PrinterContext iContext = new PrinterContext(data);
             //add metadata
-            if(fieldMetadataList != null) {
+            if (fieldMetadataList != null) {
                 FieldsMetadata reportFieldsMetadata = templateReport.createFieldsMetadata();
                 fillReportFieldsMetadata(fieldMetadataList, reportFieldsMetadata);
                 iContext.setupImages(reportFieldsMetadata);
@@ -90,7 +89,7 @@ public class PrinterService {
                 templateReport.convert(iContext, Options.getFrom(getDocumentKind(templateUrl.getFile())).to(ConverterTypeTo.PDF), outputStream);
             }
             logger.debug("New document generated with template {}", templateUrl);
-        } catch (XDocReportException | IOException e) {
+        } catch (Exception e) {
             logger.error("An error occured during document generation.", e);
             throw new DocumentGenerationException("An error occured during document generation", e);
         }
@@ -98,19 +97,20 @@ public class PrinterService {
 
     /**
      * Adds fields metadata to report.
-     * @param metadataList the input metadata
+     *
+     * @param metadataList         the input metadata
      * @param reportFieldsMetadata the report metadata to fill
      */
     private void fillReportFieldsMetadata(List<FieldMetadata> metadataList, FieldsMetadata reportFieldsMetadata) {
-        for(FieldMetadata metadata : metadataList){
-            if(metadata instanceof TextStylingFieldMetadata){
-                TextStylingFieldMetadata textStylingFieldMetadata = (TextStylingFieldMetadata)metadata;
+        for (FieldMetadata metadata : metadataList) {
+            if (metadata instanceof TextStylingFieldMetadata) {
+                TextStylingFieldMetadata textStylingFieldMetadata = (TextStylingFieldMetadata) metadata;
                 reportFieldsMetadata.addFieldAsTextStyling(textStylingFieldMetadata.getFieldName(), textStylingFieldMetadata.getSyntaxKind().toString(), Boolean.TRUE.equals(textStylingFieldMetadata.isSyntaxWithDirective()));
-            }else if(metadata instanceof ImageFieldMetadata){
-                ImageFieldMetadata imageFieldMetadata = (ImageFieldMetadata)metadata;
+            } else if (metadata instanceof ImageFieldMetadata) {
+                ImageFieldMetadata imageFieldMetadata = (ImageFieldMetadata) metadata;
                 reportFieldsMetadata.addFieldAsImage(imageFieldMetadata.getFieldName(), NullImageBehaviour.valueOf(imageFieldMetadata.getNullImageBehaviour().toString()), Boolean.TRUE.equals(imageFieldMetadata.isUseImageSize()));
             }
-            if(Boolean.TRUE.equals(metadata.isListType())){
+            if (Boolean.TRUE.equals(metadata.isListType())) {
                 reportFieldsMetadata.addFieldAsList(metadata.getFieldName());
             }
         }
