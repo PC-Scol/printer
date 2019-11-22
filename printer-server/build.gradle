@@ -58,15 +58,17 @@ jib {
             password = findProperty('dockerPassword') ?: System.getenv('dockerPassword')
         }
     }
-
+    
     container {
         useCurrentTimestamp = true
         format = 'Docker'
         labels = [
-                'fr.pc-scol.vendor': 'PC-SCOL',
-                'fr.pc-scol.app'   : 'PEGASE',
-                'fr.pc-scol.module': 'printer-server',
-                version            : rootProject.version
+                maintainer            : '_ops@pc-scol.fr',
+                'fr.pc-scol.vendor'   : 'PC-SCOL',
+                'fr.pc-scol.app'      : 'PEGASE',
+                'fr.pc-scol.module'   : 'printer',
+                'fr.pc-scol.component': 'printer-server',
+                version               : rootProject.version
         ]
         ports = ['8080/tcp']
         jvmFlags = ['-Djava.security.egd=file:/dev/./urandom']
