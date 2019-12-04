@@ -52,7 +52,6 @@ jib {
     }
     to {
         image = "${deliveryImageRegistry}/${deliveryImageRepository}/${imageName}:${rootProject.version}"
-        tags = ['latest']
         auth {
             username = findProperty('dockerUsername') ?: System.getenv('dockerUsername')
             password = findProperty('dockerPassword') ?: System.getenv('dockerPassword')

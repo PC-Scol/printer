@@ -42,41 +42,34 @@ sourceSets {
     }
 }
 
-task("swaggerAggregateFiles", type: SwaggerAggregateFiles) {
-    group 'Source Generation'
-    description 'Aggrège les différents fichiers yml de description d\'API en un seul.'
+
+task copyInputSpec(type: Copy) {
+    from file("${projectDir}/yml/printer-api.yml").toString()
+    into file("${buildDir}/swagger").toString()
 }
 
+def inputSpec = file("${buildDir}/swagger/printer-api.yml")
 
 task("swaggerCodeGen", type: SwaggerCodeGenTaskV3) {
     group 'Source Generation'
     description 'Génère les sources de l\'API à partir du fichier yml.'
-}
+    dependsOn copyInputSpec
 
-swaggerCodeGen.dependsOn swaggerAggregateFiles
-compileJava.dependsOn swaggerCodeGen
-
-swaggerAggregateFiles {
-    apiFiles = fileTree(dir: 'yml', includes: ['**/*.yml'])
-    output = file("$buildDir/swagger/printer-api.yml")
-}
-swaggerCodeGen {
-    apiFile = file("${projectDir}/yml/printer-api.yml")
+    apiFile = inputSpec
     lang = 'spring'
     configFile = file('swaggerCodeGenSpringConfig.json')
 }
+compileJava.dependsOn swaggerCodeGen
 
-def apiFile = file("${buildDir}/swagger/printer-api.yml")
-def apiArtifact = artifacts.add("apiArtifact", apiFile) {
+def apiArtifact = artifacts.add("apiArtifact", inputSpec) {
     type "yml"
-    builtBy swaggerAggregateFiles
 }
 
 signing {
     def signingKey = findProperty('signingKey') ?: System.getenv("signingKey")
     def signingPassword = findProperty('signingPassword') ?: System.getenv("signingPassword")
     useInMemoryPgpKeys(signingKey, signingPassword)
-    sign configurations.archives
+    sign publishing.publications
 }
 
 publishing {

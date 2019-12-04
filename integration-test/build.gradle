@@ -11,6 +11,14 @@ dependencyManagement {
     }
 }
 
+import org.apache.tools.ant.filters.ReplaceTokens
+
+processTestResources {
+    filter ReplaceTokens, tokens: [
+            "image.version": project.version
+    ]
+}
+
 configurations {
     swaggerCodegen // Exécutable Swagger codegen-cli
 }
@@ -59,4 +67,9 @@ swaggerCodeGen {
     configFile = file('swaggerCodeGenJavaConfig.json')
 }
 
+composeUp.dependsOn(':printer-server:jibDockerBuild')
 dockerCompose.isRequiredBy(test)
+
+dockerCompose {
+    useComposeFiles = ["$project.buildDir/resources/test/docker-compose.yml"]
+}
