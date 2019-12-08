@@ -7,6 +7,8 @@ jobs:
     env:
       dockerUsername: ${{ secrets.DOCKER_USERNAME }}
       dockerPassword: ${{ secrets.DOCKER_PASSWORD }}
+      ossrhUserName: ${{ secrets.OSSRH_USERNAME }}
+      ossrhPassword: ${{ secrets.OSSRH_PASSWORD }}
       signingKey: ${{ secrets.GPG_KEY }}
       signingPassword: ${{ secrets.GPG_PASSWORD }}
     runs-on: ubuntu-latest
@@ -24,6 +26,11 @@ jobs:
         with:
           arguments: :printer-api:build
 
+      - name: Publish Printer API
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :printer-api:publish
+
       - name: Build Printer Server
         uses: eskatos/gradle-command-action@v1
         with:
@@ -33,6 +40,11 @@ jobs:
         uses: eskatos/gradle-command-action@v1
         with:
           arguments: :integration-test:build
+
+      - name: Close & Release Repo
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: closeAndReleaseRepository
 
       - name: Push Docker Image
         uses: eskatos/gradle-command-action@v1
