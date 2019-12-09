@@ -75,20 +75,48 @@ signing {
 publishing {
     publications {
         api(MavenPublication) {
-            groupId 'fr.pcscol.printer'
+
+            groupId 'fr.pc-scol.printer'
             artifactId 'printer-api'
             artifact apiArtifact
+
+            pom {
+                name = 'printer-api'
+                description = 'The printer service API spec'
+                url = 'https://github.com/PC-Scol/printer/'
+                licenses {
+                    license {
+                        name = 'GNU Affero General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/agpl-3.0.fr.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'zaghdous'
+                        name = 'Sabri ZAGHDOUDI'
+                        email = 'sabri.zaghdoudi@pc-scol.fr'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git@github.com:PC-Scol/printer.git'
+                    url = 'https://github.com/PC-Scol/printer'
+                }
+            }
         }
     }
     repositories {
         maven {
-            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials {
-                username ossrhUserName
-                password ossrhPassword
+                username = findProperty('ossrhUserName') ?: System.getenv('ossrhUserName')
+                password = findProperty('ossrhPassword') ?: System.getenv('ossrhPassword')
             }
         }
+    }
+}
+
+tasks.withType(PublishToMavenRepository) {
+    onlyIf {
+        !version.endsWith('SNAPSHOT')
     }
 }

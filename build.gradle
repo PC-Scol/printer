@@ -2,6 +2,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.8.RELEASE' apply false
     id 'org.springframework.boot' version '2.2.0.RELEASE' apply false
     id 'com.google.cloud.tools.jib' version '1.8.0' apply false
+    id 'io.codearte.nexus-staging' version '0.21.1'
 }
 
 allprojects {
@@ -15,3 +16,13 @@ group 'fr.pcscol.printer'
 subprojects {
     version = rootProject.version
 }
+
+nexusStaging {
+    serverUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+    username = findProperty('ossrhUserName') ?: System.getenv('ossrhUserName')
+    password = findProperty('ossrhPassword') ?: System.getenv('ossrhPassword')
+    packageGroup = "fr.pc-scol.printer"
+}
+
+tasks.closeRepository.onlyIf { !version.endsWith('SNAPSHOT') }
+tasks.releaseRepository.onlyIf { !version.endsWith('SNAPSHOT') }
