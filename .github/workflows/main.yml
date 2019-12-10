@@ -44,7 +44,7 @@ jobs:
       - name: Close & Release Repo
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: closeAndReleaseRepository --debug --stacktrace
+          arguments: closeAndReleaseRepository --stacktrace
 
       - name: Push Docker Image
         uses: eskatos/gradle-command-action@v1
