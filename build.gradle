@@ -18,7 +18,6 @@ subprojects {
 }
 
 nexusStaging {
-    serverUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     username = findProperty('ossrhUserName') ?: System.getenv('ossrhUserName')
     password = findProperty('ossrhPassword') ?: System.getenv('ossrhPassword')
     packageGroup = "fr.pc-scol.printer"
