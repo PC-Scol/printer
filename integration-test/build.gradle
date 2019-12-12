@@ -15,7 +15,8 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 processTestResources {
     filter ReplaceTokens, tokens: [
-            "image.version": project.version
+            "image.version"     : project.version,
+            "project.projectDir": project.projectDir.toString()
     ]
 }
 
@@ -67,7 +68,7 @@ swaggerCodeGen {
     configFile = file('swaggerCodeGenJavaConfig.json')
 }
 
-composeUp.dependsOn(':printer-server:jibDockerBuild')
+composeUp.dependsOn(':printer-server:jibDockerBuild', 'processTestResources')
 dockerCompose.isRequiredBy(test)
 
 dockerCompose {
