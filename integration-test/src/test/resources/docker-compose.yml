@@ -9,6 +9,6 @@ services:
     environment:
       printer.template.base-url: file:///app/templates
     volumes:
-    - type: volume
+    - type: bind
       source: @project.projectDir@/src/test/resources/templates
       target: /app/templates
