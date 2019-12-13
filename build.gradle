@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '2.2.0.RELEASE' apply false
     id 'com.google.cloud.tools.jib' version '1.8.0' apply false
     id 'io.codearte.nexus-staging' version '0.21.1'
+    id "com.gorylenko.gradle-git-properties" version '2.1.0' apply false
 }
 
 allprojects {

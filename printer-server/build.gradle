@@ -5,6 +5,7 @@ plugins {
     id 'io.spring.dependency-management'
     id 'jacoco'
     id 'com.google.cloud.tools.jib'
+    id "com.gorylenko.gradle-git-properties"
 }
 
 
