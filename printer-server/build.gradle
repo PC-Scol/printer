@@ -31,6 +31,9 @@ dependencies {
     implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xDocReportVersion}")
     implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}")
 
+    //jasperreport
+    implementation("net.sf.jasperreports:jasperreports:${jasperReportsVersion}")
+
     // Swagger
     implementation "io.springfox:springfox-swagger2:${springfoxSwagger2Version}"
     runtimeOnly "io.springfox:springfox-swagger-ui:${springfoxSwaggerUiVersion}"

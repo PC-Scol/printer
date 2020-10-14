@@ -76,17 +76,17 @@ public class PrinterApplicationMockMvcTest {
             //mock printService call
             doAnswer((Answer<Void>) invocation ->
                     {
-                        byte[] generatedBytes = PrinterApplicationMockMvcTest.class.getResourceAsStream("/out.pdf").readAllBytes();
+                        byte[] generatedBytes = PrinterApplicationMockMvcTest.class.getResourceAsStream("/xdoc/out.pdf").readAllBytes();
                         //write generated to outputstream arg
                         ((OutputStream) invocation.getArgument(4)).write(generatedBytes);
                         //write response to outFile
                         outputStream.write(generatedBytes);
                         return null;
                     }
-            ).when(printerService).generate(eq(PrinterUtil.completeUrl("certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
+            ).when(printerService).generate(eq(PrinterUtil.completeUrl("xdoc/certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
 
             //invoke WS
-            PrintMessage printMessage = new PrintMessage().templateUrl("certificat.odt").data(personBean).convert(true);
+            PrintMessage printMessage = new PrintMessage().templateUrl("xdoc/certificat.odt").data(personBean).convert(true);
             String body = objectMapper.writeValueAsString(printMessage);
             mvc.perform(post("/printer/v1/print").contentType(MediaType.APPLICATION_JSON).content(body))
                     .andExpect(status().isOk())
@@ -143,10 +143,10 @@ public class PrinterApplicationMockMvcTest {
 
         //mock printService call
         doThrow(new DocumentGenerationException("An error occured during document generation")).when(printerService).generate(
-                eq(PrinterUtil.completeUrl("certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
+                eq(PrinterUtil.completeUrl("xdoc/certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
 
         //invoke WS
-        PrintMessage printMessage = new PrintMessage().templateUrl("certificat.odt").data(personBean).convert(true);
+        PrintMessage printMessage = new PrintMessage().templateUrl("xdoc/certificat.odt").data(personBean).convert(true);
         String body = objectMapper.writeValueAsString(printMessage);
         mvc.perform(post("/printer/v1/print").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isInternalServerError())

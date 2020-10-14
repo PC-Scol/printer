@@ -55,7 +55,7 @@ public class PrinterServiceTest {
         outFile.deleteOnExit();
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/certificat.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/certificat.odt");
         //data
         PersonBean personBean = new PersonBean("Jean", "Dupont");
         Map<String, Object> map = objectMapper.convertValue(personBean, Map.class);
@@ -81,7 +81,7 @@ public class PrinterServiceTest {
         outFile.deleteOnExit();
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/certificat.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/certificat.odt");
         //data
         PersonBean personBean = new PersonBean("Jean", "Dupont");
         Map<String, Object> map = objectMapper.convertValue(personBean, Map.class);
@@ -127,7 +127,7 @@ public class PrinterServiceTest {
     public void generateWithTemplateNotAllowedTest() {
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_not_allowed.txt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_not_allowed.txt");
         //data
         PersonBean personBean = new PersonBean("Jean", "Dupont");
         Map<String, Object> map = objectMapper.convertValue(personBean, Map.class);
@@ -153,11 +153,11 @@ public class PrinterServiceTest {
         outFile.deleteOnExit();
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata.odt");
         //data
         Map<String, Object> map = new HashMap<>();
         map.put("o1", new HashMap<>());
-        map.put("logo", new ClassPathImageProvider(PrinterServiceTest.class, "/logo.gif"));
+        map.put("logo", new ClassPathImageProvider(PrinterServiceTest.class, "/xdoc/logo.gif"));
         map.put("items", Lists.newArrayList("item1", "item2", "item3"));
         map.put("url", "http://google.com");
         map.put("link", "<a href=\"${url}\">Google</a> ");
@@ -189,10 +189,10 @@ public class PrinterServiceTest {
         outFile.deleteOnExit();
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata_nesting.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata_nesting.odt");
         //data
         String image;
-        try (InputStream inputStream = this.getClass().getResourceAsStream("/logo.gif")) {
+        try (InputStream inputStream = this.getClass().getResourceAsStream("/xdoc/logo.gif")) {
             image = Base64.encode(inputStream.readAllBytes());
         }
         PrinterContext printerContext = new PrinterContext();
@@ -226,10 +226,10 @@ public class PrinterServiceTest {
     public void generateWithFieldsMetadataNotListErrorTest() {
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata.odt");
         //data
         Map<String, Object> map = new HashMap<>();
-        map.put("logo", new ClassPathImageProvider(PrinterServiceTest.class, "/logo.gif"));
+        map.put("logo", new ClassPathImageProvider(PrinterServiceTest.class, "/xdoc/logo.gif"));
         //NOT LIST
         map.put("items", "singleItem");
 
@@ -256,7 +256,7 @@ public class PrinterServiceTest {
     public void generateWithFieldsMetadataImageNotFoundErrorTest() {
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata.odt");
         //data
         Map<String, Object> map = new HashMap<>();
         map.put("logo", new ClassPathImageProvider(PrinterServiceTest.class, "/unknown.gif"));
@@ -285,7 +285,7 @@ public class PrinterServiceTest {
     public void generateWithFieldsMetadataImageBadlyEncodedErrorTest() {
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata.odt");
         //data
         PrinterContext printerContext = new PrinterContext();
         printerContext.put("logo", new Object());

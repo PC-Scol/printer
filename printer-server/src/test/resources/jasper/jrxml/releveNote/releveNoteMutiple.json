@@ -1,0 +1,300 @@
+[
+		{
+			"etablissement": {
+				"codeStructure": "ETAB00",
+				"nom": "UJF"
+			},
+			"periode": {
+				"code": "A2020",
+				"libelleAffichage": "Année universitaire 2020/2021"
+			},
+			"apprenant": {
+				"nom": "DUPONT",
+				"prenom": "Jean"
+			},
+			"listeNotes" : [
+				{
+					"libelle": "Mathématique",
+					"note": "18.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Physique",
+					"note": "15.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Chimie",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Anglais",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Sport",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Informatique",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Communication orale",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Communication écrite",
+					"note": "14.000",
+					"bareme": "20"
+				}
+			]
+		},
+		{
+			"etablissement": {
+				"codeStructure": "ETAB00",
+				"nom": "UJF"
+			},
+			"periode": {
+				"code": "A2020",
+				"libelleAffichage": "Année universitaire 2020/2021"
+			},
+			"apprenant": {
+				"nom": "DURANT",
+				"prenom": "Pierre"
+			},
+			"listeNotes" : [
+				{
+					"libelle": "Mathématique",
+					"note": "18.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Physique",
+					"note": "15.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Chimie",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Anglais",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Sport",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Informatique",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Communication orale",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Communication écrite",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				}
+			]
+		},
+		{
+			"etablissement": {
+				"codeStructure": "ETAB00",
+				"nom": "UJF"
+			},
+			"periode": {
+				"code": "A2020",
+				"libelleAffichage": "Année universitaire 2020/2021"
+			},
+			"apprenant": {
+				"nom": "DURANT",
+				"prenom": "Pierre"
+			},
+			"listeNotes" : [
+				{
+					"libelle": "Mathématique",
+					"note": "18.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Physique",
+					"note": "15.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Chimie",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Anglais",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Sport",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Informatique",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Communication orale",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Communication écrite",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				},
+				{
+					"libelle": "Autre",
+					"note": "14.000",
+					"bareme": "20"
+				}
+			]
+		}
+]

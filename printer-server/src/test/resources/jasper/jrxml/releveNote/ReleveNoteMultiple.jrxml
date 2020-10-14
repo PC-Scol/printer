@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.14.0.final using JasperReports Library version 6.14.0-2ab0d8625be255bf609c78e1181801213e51db8f  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReleveNoteMultiple" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e551dda4-f8d3-4735-9bf8-5b7fdcc31eac">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ReleveNoteMultipleDataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<subDataset name="listeRelevesNotes" uuid="5e8d4d37-b92c-4566-8c72-38c4fad5f89b">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ReleveNoteMultipleDataAdapter.xml"/>
+		<queryString language="json">
+			<![CDATA[listeRelevesNotes]]>
+		</queryString>
+	</subDataset>
+	<queryString language="json">
+		<![CDATA[etablissement.nom]]>
+	</queryString>
+	<field name="node" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="."/>
+		<fieldDescription><![CDATA[.]]></fieldDescription>
+	</field>
+	<field name="etablissementNom" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="etablissement.nom"/>
+		<fieldDescription><![CDATA[etablissementNom]]></fieldDescription>
+	</field>
+	<detail>
+		<band height="842" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<line>
+				<reportElement x="0" y="0" width="100" height="1" forecolor="#FF0400" uuid="467cb154-d3f9-4485-8891-7e72cec4446f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<break>
+				<reportElement x="0" y="0" width="99" height="1" uuid="062b2670-5b11-49cf-b915-bddcd5ccc134">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<printWhenExpression><![CDATA[$V{PAGE_NUMBER}%2==0]]></printWhenExpression>
+				</reportElement>
+			</break>
+			<subreport isUsingCache="true" runToBottom="true">
+				<reportElement x="0" y="1" width="595" height="841" uuid="06f21065-f818-4247-9b6d-95abd4494d45">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource(".")]]></dataSourceExpression>
+				<subreportExpression><![CDATA["ReleveNoteUnitaire.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>
