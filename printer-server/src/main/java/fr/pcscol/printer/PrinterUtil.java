@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,14 +29,6 @@ public final class PrinterUtil {
     public static final String QUOTE = "\"";
     private static final String DOT = ".";
     private static final String UNDERSCORE = "_";
-
-
-    public static final File getFile(URL url) throws URISyntaxException, IOException {
-        File f = new File(url.toURI());
-        f.getParentFile().mkdirs();
-        f.createNewFile();
-        return f;
-    }
 
     public static final URL completeUrl(final String templateUrl, final String templateBaseUrl) throws MalformedURLException {
         URI uri;
