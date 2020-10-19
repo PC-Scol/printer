@@ -1,4 +1,4 @@
-package fr.pcscol.printer.service;
+package fr.pcscol.printer.service.jasper;
 
 public enum JasperExportType {
     PDF,

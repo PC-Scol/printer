@@ -70,6 +70,10 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="etablissement.nom"/>
 		<fieldDescription><![CDATA[etablissementNom]]></fieldDescription>
 	</field>
+	<field name="etablissementLogo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="etablissement.logo"/>
+		<fieldDescription><![CDATA[etablissementLogo]]></fieldDescription>
+	</field>
 	<field name="periodeLibelleAffichage" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="periode.libelleAffichage"/>
 		<fieldDescription><![CDATA[periodeLibelleAffichage]]></fieldDescription>
@@ -94,7 +98,7 @@ Licence de mathématiques – 1ère année]]></text>
 			</staticText>
 			<image>
 				<reportElement x="0" y="0" width="80" height="79" uuid="0ce9196f-ad16-4641-9268-d4f1782454a6"/>
-				<imageExpression><![CDATA["logo.gif"]]></imageExpression>
+				<imageExpression class="java.awt.Image"><![CDATA[$F{etablissementLogo}]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="80" y="0" width="221" height="50" uuid="4da1477a-e2bb-4955-a66d-af0ce1167ffc"/>

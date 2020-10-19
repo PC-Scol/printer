@@ -1,4 +1,4 @@
-package fr.pcscol.printer.service;
+package fr.pcscol.printer.service.xdoc;
 
 import fr.opensagres.xdocreport.converter.ConverterTypeTo;
 import fr.opensagres.xdocreport.converter.Options;

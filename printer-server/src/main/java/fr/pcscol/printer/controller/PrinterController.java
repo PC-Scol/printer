@@ -4,7 +4,7 @@ import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.PrinterApi;
 import fr.pcscol.printer.api.model.FieldMetadata;
 import fr.pcscol.printer.api.model.PrintMessage;
-import fr.pcscol.printer.service.PrinterService;
+import fr.pcscol.printer.service.xdoc.PrinterService;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.ServletContext;
 import javax.validation.constraints.NotNull;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

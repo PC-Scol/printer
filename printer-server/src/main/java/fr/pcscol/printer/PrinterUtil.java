@@ -4,11 +4,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public final class PrinterUtil {
 
@@ -80,5 +87,44 @@ public final class PrinterUtil {
             sb.append(UNDERSCORE).append(suffix);
         }
         return sb.append(DOT).append(convert == true ? "pdf" : ext).toString();
+    }
+
+    public static void unzipTemplate(URL templateUrl, Path destination) throws IOException {
+
+        try (InputStream inputStream = templateUrl.openStream();
+             ZipInputStream zis = new ZipInputStream(inputStream)) {
+
+            File parent = new File(destination.toUri());
+            if(!parent.exists()){
+                parent.mkdirs();
+            }
+
+            ZipEntry zipEntry = zis.getNextEntry();
+            byte[] buffer = new byte[1024];
+            while (zipEntry != null) {
+
+                File newFile = new File(Path.of(parent.getPath(), zipEntry.getName()).toUri());
+                newFile.deleteOnExit();
+                logger.debug("Unzip file : {}", newFile.getAbsoluteFile());
+                if (zipEntry.isDirectory()) {
+                    newFile.mkdir();
+                } else {
+                    newFile.createNewFile();
+
+                    FileOutputStream fos = new FileOutputStream(newFile);
+                    int len;
+                    while ((len = zis.read(buffer)) > 0) {
+                        fos.write(buffer, 0, len);
+                    }
+                    fos.close();
+                }
+                zipEntry = zis.getNextEntry();
+                logger.debug("Unzipped file : {}", newFile.getAbsoluteFile());
+            }
+            zis.closeEntry();
+        } catch (IOException e) {
+            String err = String.format("Unable to load template file @ %s.", templateUrl);
+            throw e;
+        }
     }
 }

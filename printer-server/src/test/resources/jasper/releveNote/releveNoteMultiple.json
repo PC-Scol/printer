@@ -1,6 +1,7 @@
 [
 		{
 			"etablissement": {
+				"logo": "./logo2.png",
 				"codeStructure": "ETAB00",
 				"nom": "UJF"
 			},
@@ -57,6 +58,7 @@
 		},
 		{
 			"etablissement": {
+				"logo": "./logo.gif",
 				"codeStructure": "ETAB00",
 				"nom": "UJF"
 			},
@@ -178,6 +180,7 @@
 		},
 		{
 			"etablissement": {
+				"logo": "logo2.png",
 				"codeStructure": "ETAB00",
 				"nom": "UJF"
 			},
@@ -186,8 +189,8 @@
 				"libelleAffichage": "Année universitaire 2020/2021"
 			},
 			"apprenant": {
-				"nom": "DURANT",
-				"prenom": "Pierre"
+				"nom": "DUCANT",
+				"prenom": "Marc"
 			},
 			"listeNotes" : [
 				{

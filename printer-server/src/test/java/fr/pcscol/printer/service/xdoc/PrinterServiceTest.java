@@ -1,4 +1,4 @@
-package fr.pcscol.printer.service;
+package fr.pcscol.printer.service.xdoc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -9,6 +9,7 @@ import fr.pcscol.printer.api.model.ImageFieldMetadata;
 import fr.pcscol.printer.api.model.TextStylingFieldMetadata;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -32,6 +33,10 @@ import java.util.Map;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class PrinterServiceTest {
+
+    static {
+        TomcatURLStreamHandlerFactory.getInstance();
+    }
 
     @Autowired
     private PrinterService printerService;

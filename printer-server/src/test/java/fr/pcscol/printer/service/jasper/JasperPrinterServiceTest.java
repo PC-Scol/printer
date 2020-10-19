@@ -1,10 +1,11 @@
-package fr.pcscol.printer.service;
+package fr.pcscol.printer.service.jasper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,26 +37,23 @@ public class JasperPrinterServiceTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     /**
-     * Tests a correct generation of a ODT document for the given valid templateUrl and data.
+     * Tests a correct generation of a PDF document from a Jasper (with nested sub report) template and data.
      *
      * @throws IOException
      */
     @Test
-    public void generateTest() throws IOException, URISyntaxException {
+    public void generateWithNestedReportTest() throws IOException, URISyntaxException {
 
-        File outFile = File.createTempFile("releve_notes_out_", ".pdf", new File("build"));
-        outFile.deleteOnExit();
+        File outFile = File.createTempFile("releve_multiple_out_", ".pdf", new File("build"));
+        //outFile.deleteOnExit();
 
-        //jasper file
-        String templatePath = "releveNote/ReleveNoteMultiple.jasper";
         //json data input
         List<Object> data = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
 
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
-                printerService.generate(templatePath, data, JasperExportType.PDF, outputStream);
+                printerService.generate("releveNote", data, JasperExportType.PDF, outputStream);
                 Assert.assertThat(outFile.length(), Matchers.greaterThan(0L));
             } catch (Exception e) {
                 Assert.fail(e.getMessage());
@@ -66,12 +64,10 @@ public class JasperPrinterServiceTest {
     @Test
     public void generateWithTemplateNotFoundTest() throws IOException {
 
-        //templateUrl
-        String templatePath = "notFound/notFound.jasper";
         //json data input
         List<Object> data = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
         try {
-            printerService.generate(templatePath, data, JasperExportType.PDF, null);
+            printerService.generate("notfound", data, JasperExportType.PDF, null);
             Assert.fail("Should fail");
         } catch (TemplateNotFoundException e) {
             //success
