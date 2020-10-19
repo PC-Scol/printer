@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import fr.opensagres.xdocreport.core.io.IOUtils;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
@@ -54,7 +55,7 @@ public class JasperPrinterService {
         loaderService.load();
     }
 
-    public void generate(String reportName, Object data, JasperExportType exportType, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {
+    public void generate(String reportName, Object data, Map<String, Object> parameters, JasperExportType exportType, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {
 
         logger.debug("New document generation is requested with template={}, data={}, exportType={}", reportName, data, exportType);
 
@@ -65,9 +66,12 @@ public class JasperPrinterService {
             //retrieve report
             JasperPrintReport templateReport = getTemplateReport(reportName);
             //print
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put(JRParameter.REPORT_CONTEXT, templateReport.getContext());
-            JasperPrint jasperPrint = JRFiller.fill(DefaultJasperReportsContext.getInstance(), templateReport.getSource(), parameters, dataSource);
+            Map<String, Object> reportParams = new HashMap<>();
+            if(parameters != null && !parameters.isEmpty()){
+                reportParams.putAll(parameters);
+            }
+            reportParams.put(JRParameter.REPORT_CONTEXT, templateReport.getContext());
+            JasperPrint jasperPrint = JRFiller.fill(DefaultJasperReportsContext.getInstance(), templateReport.getSource(), reportParams, dataSource);
             //export
             JRAbstractExporter exporter = getExporter(exportType);
             exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
@@ -92,16 +96,13 @@ public class JasperPrinterService {
                 SimplePdfReportConfiguration reportConfig
                         = new SimplePdfReportConfiguration();
                 reportConfig.setSizePageToContent(true);
-                //reportConfig.setForceLineBreakPolicy(false);
+                reportConfig.setForceLineBreakPolicy(false);
                 //export config
                 SimplePdfExporterConfiguration exportConfig
                         = new SimplePdfExporterConfiguration();
                 exportConfig.setAllowedPermissionsHint(PRINTING);
                 exporter.setConfiguration(reportConfig);
                 exporter.setConfiguration(exportConfig);
-                break;
-            case XLS:
-                exporter = new JRXlsxExporter();
                 break;
             case DOCX:
                 exporter = new JRDocxExporter();

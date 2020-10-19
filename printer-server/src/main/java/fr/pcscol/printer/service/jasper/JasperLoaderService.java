@@ -38,22 +38,17 @@ public class JasperLoaderService {
         for (JasperTemplateDef def : configuration.getTemplates()) {
             if (def.getName().equals(name)) {
                 Path folder = Path.of(configuration.getUnzipFolder(), def.getName());
-                return loadJasperDefinition(def, folder);
+                return loadJasperDefinition(def, folder.toString());
             }
         }
         throw new TemplateNotFoundException(String.format("Template with name %s is not defined.", name));
     }
 
-    private JasperPrintReport loadJasperDefinition(JasperTemplateDef def, Path folder) {
-        JasperPrintReport jasperPrintReport = new JasperPrintReport(def, configuration.getResourceFolder());
-        jasperPrintReport.setFolder(folder);
+    private JasperPrintReport loadJasperDefinition(JasperTemplateDef def, String folder) {
+
         ReportContext reportContext = new SimpleReportContext();
-
         JasperReport report = loadFromJrxml(Path.of(folder.toString(), def.getMain()), reportContext);
-        jasperPrintReport.setMainReport(report);
-        jasperPrintReport.setReportContext(reportContext);
-        return jasperPrintReport;
-
+        return new JasperPrintReport(def.getName(), def.getUrl(), folder, configuration.getResourceFolder(), report, reportContext);
     }
 
     private JasperReport loadFromJrxml(Path jrxmlFilePath, ReportContext reportContext) throws TemplateNotFoundException {

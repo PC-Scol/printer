@@ -18,23 +18,20 @@ public class JasperPrintReport {
     private ReportContext context;
     private JasperReportSource source;
 
-    public JasperPrintReport(JasperTemplateDef def, String resourceFolder) {
-        this.name = def.getName();
-        this.url = def.getUrl();
+    public JasperPrintReport(String name, String url, String folder, String resourceFolder, JasperReport main, ReportContext context) {
+        this.name = name;
+        this.url = url;
+        this.folder = Path.of(folder);
         this.resourceFolder = resourceFolder;
+        this.main = main;
+        this.context = context;
+
+        SimpleRepositoryResourceContext fallBackContext = SimpleRepositoryResourceContext.of(resourceFolder);
+        SimpleRepositoryResourceContext resourceContext = SimpleRepositoryResourceContext.of(folder, fallBackContext);
+        resourceContext.setSelfAsDerivedFallback(true);
+        source = SimpleJasperReportSource.from(main, folder, resourceContext);
     }
 
-    public void setFolder(Path folder) {
-        this.folder = folder;
-    }
-
-    public void setMainReport(JasperReport report) {
-        this.main = report;
-    }
-
-    public void setReportContext(ReportContext reportContext) {
-        this.context = reportContext;
-    }
 
     public String getName() {
         return name;
@@ -57,13 +54,6 @@ public class JasperPrintReport {
     }
 
     public JasperReportSource getSource() {
-        if (source == null) {
-            SimpleRepositoryResourceContext fallBackContext = SimpleRepositoryResourceContext.of(resourceFolder);
-            fallBackContext.setSelfAsDerivedFallback(true);
-            SimpleRepositoryResourceContext context = SimpleRepositoryResourceContext.of(folder.toString(), fallBackContext);
-            context.setSelfAsDerivedFallback(true);
-            source = SimpleJasperReportSource.from(getMain(), folder.toString(), context);
-        }
         return source;
     }
 }
