@@ -4,7 +4,7 @@ printer:
   jasper:
     base-url: classpath:/jasper
     unzip-folder: ./build/generated
-   # resource-folder: /jasper
+    resource-folder: /jasper
     templates:
     - name: releveNote
       url: classpath:/jasper/releveNote.zip
