@@ -21,7 +21,8 @@ processTestResources {
 }
 
 configurations {
-    swaggerCodegen // Exécutable Swagger codegen-cli
+    // Exécutable Swagger codegen-cli
+    swaggerCodegen
 }
 
 dependencies {
@@ -55,18 +56,23 @@ sourceSets {
     }
 }
 
-task("swaggerCodeGen", type: SwaggerCodeGenTaskV3) {
-    group 'Source Generation'
-    description 'Génère les sources de l\'API à partir du fichier yml.'
-}
+task swaggerCodeGenV1(type: SwaggerCodeGenTaskV3) {
 
-compileJava.dependsOn swaggerCodeGen
-
-swaggerCodeGen {
-    apiFile = file("${project(':printer-api').projectDir}/yml/printer-api.yml")
+    apiFile = file("${project(':printer-api').projectDir}/yml/printer-api-v1.yml")
     lang = 'java'
-    configFile = file('swaggerCodeGenJavaConfig.json')
+    configFile = file('swaggerCodeGenV1.json')
 }
+
+task swaggerCodeGenV2(type: SwaggerCodeGenTaskV3) {
+
+    apiFile = file("${project(':printer-api').projectDir}/yml/printer-api-v2.yml")
+    lang = 'java'
+    configFile = file('swaggerCodeGenV2.json')
+}
+
+compileJava.dependsOn swaggerCodeGenV1
+compileJava.dependsOn swaggerCodeGenV2
+
 
 composeUp.dependsOn(':printer-server:jibDockerBuild', 'processTestResources')
 dockerCompose.isRequiredBy(test)

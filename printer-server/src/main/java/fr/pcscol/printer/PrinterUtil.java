@@ -1,5 +1,6 @@
 package fr.pcscol.printer;
 
+import fr.pcscol.printer.service.jasper.JasperExportType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -34,8 +35,8 @@ public final class PrinterUtil {
     public static final String SLASH = "/";
     public static final String EMPTY = "";
     public static final String QUOTE = "\"";
-    private static final String DOT = ".";
-    private static final String UNDERSCORE = "_";
+    public static final String DOT = ".";
+    public static final String UNDERSCORE = "_";
 
     public static final URL completeUrl(final String templateUrl, final String templateBaseUrl) throws MalformedURLException {
         URI uri;
@@ -63,7 +64,15 @@ public final class PrinterUtil {
          */
         String ext = fileName.substring(fileName.lastIndexOf(DOT) + 1);
         return mimeMap.get(ext);
+    }
 
+    public static final String getMimeType(JasperExportType exportType) {
+        /**
+         *  Files.probeContentType method uses mapping files not present on distroless/java image.
+         *  So we need to resolve the mimeType manually
+         */
+        String ext = exportType.toString().toLowerCase();
+        return mimeMap.get(ext);
     }
 
     public static String extractOutputFileName(String originalPath, String suffix, boolean convert) {

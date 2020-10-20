@@ -1,0 +1,207 @@
+openapi: 3.0.1
+info:
+  title: Printer Service API V2
+  description: Generates documents based on XDocReport or JasperReport by merging a template and a data model.
+  version: 2.0.0
+
+servers:
+  - url: http://printer/v2
+
+tags:
+  - name: printer
+    description: The printer resource
+
+paths:
+  '/print/xdoc':
+    post:
+      tags:
+        - printer
+        - xdoc
+      summary: Produces a document (odt, docx, doc, pdf) by merging the template and data provided within the XdocPrintMessage
+      operationId: xdocPrint
+      requestBody:
+        description: A XdocPrintMessage
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/XdocPrintMessage'
+      responses:
+        '200':
+          description: Document has been successfully generated
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+            'application/vnd.oasis.opendocument.text':
+              schema:
+                type: string
+                format: byte
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+              schema:
+                type: string
+                format: byte
+            'application/msword':
+              schema:
+                type: string
+                format: byte
+        '400':
+          description: Bad request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Template not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/print/jasper':
+    post:
+      tags:
+      - printer
+      - jasper
+      summary: Produces a document (docx, odt, pdf) by merging the template and data provided within the JasperPrintMessage
+      operationId: jasperPrint
+      requestBody:
+        description: A JasperPrintMessage
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JasperPrintMessage'
+      responses:
+        '200':
+          description: Document has been successfully generated
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+            'application/vnd.oasis.opendocument.text':
+              schema:
+                type: string
+                format: byte
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+              schema:
+                type: string
+                format: byte
+            'application/msword':
+              schema:
+                type: string
+                format: byte
+        '400':
+          description: Bad request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Template not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date
+        status:
+          type: int
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    XdocPrintMessage:
+      type: object
+      required:
+        - templateUrl
+        - data
+      properties:
+        templateUrl:
+          type: string
+          description: URL of the template used for the generation. Can be either absolute or relative (to a configured base url).
+        convert:
+          type: boolean
+          description: When true the generated document is converted to pdf.
+        data:
+          type: object
+          description: The data model to merge.
+        fieldsMetadata:
+          type: array
+          description: Metadata about how to manage data model fields.
+          items:
+            $ref: '#/components/schemas/FieldMetadata'
+    #            oneOf:
+    #              - $ref: '#/components/schemas/FieldMetadata'
+    #              - $ref: '#/components/schemas/ImageFieldMetadata'
+    #              - $ref: '#/components/schemas/TextStylingFieldMetadata'
+    FieldMetadata:
+      type: object
+      required:
+        - fieldName
+      properties:
+        fieldName:
+          type: string
+          description: The model field name
+        listType:
+          type: boolean
+          description: Set to true if field is a list
+      description: visit this [link](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainListFieldInTable) and [this](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainListFieldAdvancedTable)
+    ImageFieldMetadata:
+      allOf:
+        - $ref: '#/components/schemas/FieldMetadata'
+        - type: object
+          required:
+            - nullImageBehaviour
+          properties:
+            useImageSize:
+              type: boolean
+            nullImageBehaviour:
+              type: string
+              enum: [ThrowsError, RemoveImageTemplate, KeepImageTemplate]
+      description: visit this [link](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainDynamicImage)
+    TextStylingFieldMetadata:
+      allOf:
+        - $ref: '#/components/schemas/FieldMetadata'
+        - type: object
+          required:
+            - syntaxKind
+          properties:
+            syntaxWithDirective:
+              type: boolean
+              description: true if the field value contains FreeMarker directives
+            syntaxKind:
+              type: string
+              enum: [NoEscape, Html, GWiki, MediaWiki, MarkDown]
+      description: visit this [link](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainTextStyling)
+    JasperPrintMessage:
+      type: object
+      required:
+      - templateName
+      - data
+      properties:
+        templateName:
+          type: string
+          description: Name of the template used for the generation (name of the provided zip file).
+        exportType:
+          type: string
+          enum: [PDF, ODT, DOCX]
+          description: Type of the export.
+        data:
+          type: object
+          description: The data model to merge.
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
+          description: map of additional parameters.

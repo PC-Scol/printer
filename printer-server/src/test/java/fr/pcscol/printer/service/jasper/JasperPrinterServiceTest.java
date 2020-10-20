@@ -1,5 +1,6 @@
 package fr.pcscol.printer.service.jasper;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
@@ -45,13 +46,14 @@ public class JasperPrinterServiceTest {
      * @throws IOException
      */
     @Test
-    public void generatePdfWithNestedReportTest() throws IOException, URISyntaxException {
+    public void generatePdfWithNestedReportTest() throws IOException {
 
         File outFile = File.createTempFile("releve_multiple_out_", ".pdf", new File("build"));
         //outFile.deleteOnExit();
 
         //json data input
-        List<Object> data = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
+        List<Object> json = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
+        JsonNode data = objectMapper.convertValue(json, JsonNode.class);
         Map<String, Object> params = new HashMap<>();
         params.put("etablissementLogo", "logo2.png");
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
@@ -71,7 +73,8 @@ public class JasperPrinterServiceTest {
         //outFile.deleteOnExit();
 
         //json data input
-        List<Object> data = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
+        List<Object> json = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
+        JsonNode data = objectMapper.convertValue(json, JsonNode.class);
         Map<String, Object> params = null;
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
@@ -87,7 +90,8 @@ public class JasperPrinterServiceTest {
     public void generateWithTemplateNotFoundTest() throws IOException {
 
         //json data input
-        List<Object> data = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
+        List<Object> json = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
+        JsonNode data = objectMapper.convertValue(json, JsonNode.class);
         try {
             printerService.generate("notfound", data, null,JasperExportType.PDF, null);
             Assert.fail("Should fail");

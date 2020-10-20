@@ -15,6 +15,7 @@ import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JsonDataSource;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.oasis.JROdtExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.fill.JRFiller;
@@ -45,9 +46,6 @@ public class JasperPrinterService {
 
     private Cache<String, JasperPrintReport> reportCache = CacheBuilder.newBuilder().build();
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     public static final String PRINTING = "PRINTING";
 
     @PostConstruct
@@ -55,13 +53,12 @@ public class JasperPrinterService {
         loaderService.load();
     }
 
-    public void generate(String reportName, Object data, Map<String, Object> parameters, JasperExportType exportType, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {
+    public void generate(String reportName, JsonNode data, Map<String, Object> parameters, JasperExportType exportType, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {
 
         logger.debug("New document generation is requested with template={}, data={}, exportType={}", reportName, data, exportType);
 
         //create dataSource
-        JsonNode jsonNode = objectMapper.convertValue(data, JsonNode.class);
-        try (InputStream jsonStream = IOUtils.toInputStream(jsonNode.toString())) {
+        try (InputStream jsonStream = IOUtils.toInputStream(data.toString())) {
             JsonDataSource dataSource = new JsonDataSource(jsonStream, ".");
             //retrieve report
             JasperPrintReport templateReport = getTemplateReport(reportName);
@@ -106,6 +103,8 @@ public class JasperPrinterService {
                 break;
             case DOCX:
                 exporter = new JRDocxExporter();
+            case ODT:
+                exporter = new JROdtExporter();
                 break;
             default:
                 throw new UnsupportedOperationException("exportType is not supported");

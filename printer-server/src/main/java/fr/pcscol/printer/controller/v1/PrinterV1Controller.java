@@ -1,12 +1,15 @@
-package fr.pcscol.printer.controller;
+package fr.pcscol.printer.controller.v1;
 
 import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.PrinterApi;
 import fr.pcscol.printer.api.model.FieldMetadata;
+import fr.pcscol.printer.api.model.ImageFieldMetadata;
 import fr.pcscol.printer.api.model.PrintMessage;
-import fr.pcscol.printer.service.xdoc.PrinterService;
+import fr.pcscol.printer.api.model.TextStylingFieldMetadata;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
+import fr.pcscol.printer.service.xdoc.XdocFieldMetadata;
+import fr.pcscol.printer.service.xdoc.XdocPrinterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -22,18 +25,31 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/printer/v1")
-public class PrinterController implements PrinterApi {
+public class PrinterV1Controller implements PrinterApi {
 
     @Autowired
-    private PrinterService printerService;
+    private XdocPrinterService printerService;
 
     @Value("${printer.template.base-url}")
     private String templateBaseUrl;
+
+    public static final Function<FieldMetadata, XdocFieldMetadata> toXdocFieldMetadata = f -> {
+        XdocFieldMetadata result;
+        if (f instanceof ImageFieldMetadata) {
+            result = new XdocImageFieldMetadataAdapter((ImageFieldMetadata) f);
+        } else if (f instanceof TextStylingFieldMetadata) {
+            result = new XdocTextStylingFieldMetadataAdapter((TextStylingFieldMetadata) f);
+        } else {
+            result = new XdocFieldMetadataAdapter(f);
+        }
+        return result;
+    };
 
     @Override
     public ResponseEntity<byte[]> print(@NotNull PrintMessage body) {
@@ -50,8 +66,11 @@ public class PrinterController implements PrinterApi {
         //data to print
         Map<String, Object> data = (Map<String, Object>) body.getData();
 
-        //metadata about data fields
-        List<FieldMetadata> fieldMetadataList = body.getFieldsMetadata();
+        //metadata about fields
+        List<XdocFieldMetadata> fieldMetadataList = null;
+        if(body.getFieldsMetadata() != null) {
+           fieldMetadataList = Optional.ofNullable(body.getFieldsMetadata()).orElse(Collections.emptyList()).stream().map(toXdocFieldMetadata).collect(Collectors.toList());
+        }
 
         //is pdf conversion requested
         boolean convert = Boolean.TRUE.equals(body.isConvert());

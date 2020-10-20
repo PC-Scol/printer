@@ -46,7 +46,7 @@ public class PrinterApplicationIntegrationTest {
         //build PrintMessage
         PersonBean personBean = new PersonBean("Jean", "Dupont");
         PrintMessage printMessage = new PrintMessage().templateUrl("certificat.odt").data(personBean).convert(true);
-
+        printerApi.getApiClient().setBasePath("http://localhost:8080/printer/v1");
         byte[] content = printerApi.print(printMessage);
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             outputStream.write(content);

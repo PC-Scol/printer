@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pcscol.printer.PersonBean;
 import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.model.PrintMessage;
-import fr.pcscol.printer.service.xdoc.PrinterService;
+import fr.pcscol.printer.controller.v1.PrinterV1Controller;
+import fr.pcscol.printer.service.xdoc.XdocPrinterService;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Tests the {@link PrinterController} layer.
+ * Tests the {@link PrinterV1Controller} layer.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -47,7 +48,7 @@ public class PrinterApplicationMockMvcTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private PrinterService printerService;
+    private XdocPrinterService printerService;
 
     @Value("${printer.template.base-url}")
     private String templateBaseUrl;
