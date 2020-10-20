@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,10 +52,11 @@ public class JasperPrinterServiceTest {
 
         //json data input
         List<Object> data = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
-        Map<String, Object> params = null;
+        Map<String, Object> params = new HashMap<>();
+        params.put("etablissementLogo", "logo2.png");
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
-                printerService.generate("releveNote", data, null, JasperExportType.PDF, outputStream);
+                printerService.generate("releveNote", data, params, JasperExportType.PDF, outputStream);
                 Assert.assertThat(outFile.length(), Matchers.greaterThan(0L));
             } catch (Exception e) {
                 Assert.fail(e.getMessage());
