@@ -8,14 +8,14 @@ servers:
   - url: http://printer/v1
 
 tags:
-  - name: printer
+  - name: Printer
     description: The printer resource
 
 paths:
   '/print':
     post:
       tags:
-        - printer
+        - Printer
       summary: Produces a document (odt, docx, doc, pdf) by merging the template and data provided within the PrintMessage
       operationId: print
       requestBody:

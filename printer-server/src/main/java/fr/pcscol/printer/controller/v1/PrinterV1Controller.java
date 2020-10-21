@@ -10,6 +10,7 @@ import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import fr.pcscol.printer.service.xdoc.XdocFieldMetadata;
 import fr.pcscol.printer.service.xdoc.XdocPrinterService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/printer/v1")
+@Api(tags = {"Printer"}, description = "Printer V1 resource")
 public class PrinterV1Controller implements PrinterApi {
 
     @Autowired

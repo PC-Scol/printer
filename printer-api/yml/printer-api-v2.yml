@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Printer Service API V2
+  title: Printer Service API
   description: Generates documents based on XDocReport or JasperReport by merging a template and a data model.
   version: 2.0.0
 
@@ -8,15 +8,14 @@ servers:
   - url: http://printer/v2
 
 tags:
-  - name: printer
+  - name: Printer
     description: The printer resource
 
 paths:
   '/print/xdoc':
     post:
       tags:
-        - printer
-        - xdoc
+        - Printer
       summary: Produces a document (odt, docx, doc, pdf) by merging the template and data provided within the XdocPrintMessage
       operationId: xdocPrint
       requestBody:
@@ -61,8 +60,7 @@ paths:
   '/print/jasper':
     post:
       tags:
-      - printer
-      - jasper
+      - Printer
       summary: Produces a document (docx, odt, pdf) by merging the template and data provided within the JasperPrintMessage
       operationId: jasperPrint
       requestBody:

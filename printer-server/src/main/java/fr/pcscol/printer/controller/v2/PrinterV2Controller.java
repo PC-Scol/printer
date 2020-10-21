@@ -3,17 +3,16 @@ package fr.pcscol.printer.controller.v2;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pcscol.printer.PrinterUtil;
-import fr.pcscol.printer.api.v2.model.*;
 import fr.pcscol.printer.api.v2.PrinterApi;
-import fr.pcscol.printer.controller.v2.XdocFieldMetadataAdapter;
-import fr.pcscol.printer.controller.v2.XdocImageFieldMetadataAdapter;
-import fr.pcscol.printer.controller.v2.XdocTextStylingFieldMetadataAdapter;
+import fr.pcscol.printer.api.v2.model.JasperPrintMessage;
+import fr.pcscol.printer.api.v2.model.XdocPrintMessage;
+import fr.pcscol.printer.service.exception.DocumentGenerationException;
+import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import fr.pcscol.printer.service.jasper.JasperExportType;
 import fr.pcscol.printer.service.jasper.JasperPrinterService;
 import fr.pcscol.printer.service.xdoc.XdocFieldMetadata;
-import fr.pcscol.printer.service.exception.DocumentGenerationException;
-import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import fr.pcscol.printer.service.xdoc.XdocPrinterService;
+import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,12 +29,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/printer/v2")
+@Api(tags = {"Printer"}, description = "Printer V2 resource")
 public class PrinterV2Controller implements PrinterApi {
 
     @Autowired
