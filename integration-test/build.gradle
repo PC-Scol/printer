@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'maven'
     id 'io.spring.dependency-management'
     id "com.avast.gradle.docker-compose" version "0.10.4"
 }
@@ -43,9 +42,9 @@ dependencies {
 
     compileOnly 'org.springframework.boot:spring-boot-starter'
 
-    testCompile 'org.springframework.boot:spring-boot-starter-test'
-    testCompile 'org.springframework:spring-web'
-    testCompile 'com.fasterxml.jackson.core:jackson-databind'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework:spring-web'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 sourceSets {

@@ -7,5 +7,5 @@ repositories {
 }
 
 dependencies {
-    compile 'org.yaml:snakeyaml:1.25'
+    implementation 'org.yaml:snakeyaml:1.25'
 }

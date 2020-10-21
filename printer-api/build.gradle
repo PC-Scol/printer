@@ -1,9 +1,5 @@
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.Copy
-
 plugins {
     id 'java'
-    id 'maven'
     id 'maven-publish'
     id 'io.spring.dependency-management'
     id 'signing'
