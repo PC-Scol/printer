@@ -55,7 +55,9 @@ public class JasperPrinterServiceTest {
         List<Object> json = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
         JsonNode data = objectMapper.convertValue(json, JsonNode.class);
         Map<String, Object> params = new HashMap<>();
-        params.put("etablissementLogo", "logo2.png");
+        params.put("fr.pcscol.logo", "logo2.png");
+        params.put("fr.pcscol.nomResponsable", "Jean Bernard");
+        params.put("fr.pcscol.nomEtablissement", "INU Champollion");
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
                 printerService.generate("releveNote", data, params, JasperExportType.PDF, outputStream);
@@ -67,18 +69,21 @@ public class JasperPrinterServiceTest {
     }
 
     @Test
-    public void generateDocxWithNestedReportTest() throws IOException, URISyntaxException {
+    public void generateOdtWithNestedReportTest() throws IOException {
 
-        File outFile = File.createTempFile("releve_multiple_out_", ".docx", new File("build"));
+        File outFile = File.createTempFile("releve_multiple_out_", ".odt", new File("build"));
         //outFile.deleteOnExit();
 
         //json data input
         List<Object> json = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
         JsonNode data = objectMapper.convertValue(json, JsonNode.class);
-        Map<String, Object> params = null;
+        Map<String, Object> params = new HashMap<>();
+        params.put("fr.pcscol.logo", "logo.gif");
+        params.put("fr.pcscol.nomResponsable", "Jean Bernard");
+        params.put("fr.pcscol.nomEtablissement", "INU Champollion");
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
-                printerService.generate("releveNote", data, null, JasperExportType.DOCX, outputStream);
+                printerService.generate("releveNote", data, null, JasperExportType.ODT, outputStream);
                 Assert.assertThat(outFile.length(), Matchers.greaterThan(0L));
             } catch (Exception e) {
                 Assert.fail(e.getMessage());

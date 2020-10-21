@@ -17,6 +17,7 @@ public class PrinterApiClientConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(PrinterApiClientConfiguration.class);
 
     private static final String printerApiBasePath = "http://%s:%s/printer/v1";
+    private static final String printerApiV2BasePath = "http://%s:%s/printer/v2";
 
     @Value("#{systemProperties['printer-server.host']}")
     private String host;
@@ -35,7 +36,22 @@ public class PrinterApiClientConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public fr.pcscol.printer.client.v2.ApiClient printerApiClientV2(PrinterRestTemplate printerRestTemplate) {
+        fr.pcscol.printer.client.v2.ApiClient printerApiClient = new fr.pcscol.printer.client.v2.ApiClient(printerRestTemplate.getRestTemplate());
+        printerApiClient.setBasePath(String.format(printerApiV2BasePath, host, port));
+
+        return printerApiClient;
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public PrinterApi getPrinterApi(ApiClient printerApiClient) {
         return new PrinterApi(printerApiClient);
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public fr.pcscol.printer.client.v2.api.PrinterApi getPrinterApiV2(fr.pcscol.printer.client.v2.ApiClient printerApiClientV2) {
+        return new fr.pcscol.printer.client.v2.api.PrinterApi(printerApiClientV2);
     }
 }

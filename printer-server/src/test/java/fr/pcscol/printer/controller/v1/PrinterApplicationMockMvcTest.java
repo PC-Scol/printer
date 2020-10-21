@@ -1,10 +1,9 @@
-package fr.pcscol.printer.controller;
+package fr.pcscol.printer.controller.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pcscol.printer.PersonBean;
 import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.model.PrintMessage;
-import fr.pcscol.printer.controller.v1.PrinterV1Controller;
 import fr.pcscol.printer.service.xdoc.XdocPrinterService;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;

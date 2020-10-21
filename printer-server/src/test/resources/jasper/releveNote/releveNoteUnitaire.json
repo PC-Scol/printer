@@ -1,6 +1,5 @@
 {
 	"etablissement": {
-		"logo": "./logo.gif",
 		"codeStructure": "ETAB00",
 		"nom": "Champolion"
 	},

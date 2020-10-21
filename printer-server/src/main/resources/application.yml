@@ -6,7 +6,6 @@ printer:
     unzip-folder: ./build/generated
     resource-folder: /jasper
     templates:
-    - name: releveNote
-      url: classpath:/jasper/releveNote.zip
+
 #actuator
 #management.server.port=9090

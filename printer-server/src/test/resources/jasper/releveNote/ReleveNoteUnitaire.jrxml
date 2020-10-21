@@ -47,6 +47,9 @@
 			<fieldDescription><![CDATA[bareme]]></fieldDescription>
 		</field>
 	</subDataset>
+	<parameter name="fr.pcscol.logo" class="java.lang.String"/>
+	<parameter name="fr.pcscol.nomResponsable" class="java.lang.String"/>
+	<parameter name="fr.pcscol.nomEtablissement" class="java.lang.String"/>
 	<queryString language="json">
 		<![CDATA[.]]>
 	</queryString>
@@ -70,10 +73,6 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="etablissement.nom"/>
 		<fieldDescription><![CDATA[etablissementNom]]></fieldDescription>
 	</field>
-	<field name="etablissementLogo" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="etablissement.logo"/>
-		<fieldDescription><![CDATA[etablissementLogo]]></fieldDescription>
-	</field>
 	<field name="periodeLibelleAffichage" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="periode.libelleAffichage"/>
 		<fieldDescription><![CDATA[periodeLibelleAffichage]]></fieldDescription>
@@ -94,15 +93,18 @@
 					<font size="18"/>
 				</textElement>
 				<text><![CDATA[Relevé de notes et de résultats définitif
-Licence de mathématiques – 1ère année]]></text>
+Licence de mathématiques - 1ère année]]></text>
 			</staticText>
 			<image>
 				<reportElement x="0" y="0" width="80" height="79" uuid="0ce9196f-ad16-4641-9268-d4f1782454a6"/>
-				<imageExpression class="java.awt.Image"><![CDATA[$F{etablissementLogo}]]></imageExpression>
+				<imageExpression><![CDATA[$P{fr.pcscol.logo}]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="80" y="0" width="221" height="50" uuid="4da1477a-e2bb-4955-a66d-af0ce1167ffc"/>
-				<text><![CDATA[Institut National Universitaire XXX]]></text>
+				<text><![CDATA[Institut National Universitaire Champollion
+
+Place de Verdun
+81 012 Albi]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="301" y="0" width="254" height="30" uuid="15fc375b-a022-47d1-a86e-e5cb3ea3690f"/>
@@ -117,6 +119,26 @@ Licence de mathématiques – 1ère année]]></text>
 				<reportElement x="0" y="160" width="555" height="20" uuid="6558baa6-c328-418f-92a0-e12b39dfb2f7"/>
 				<textFieldExpression><![CDATA["N° étudiant : XXXXXXXX / INE : XXXXXXXXXXZ"]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement x="440" y="38" width="114" height="20" uuid="f4a779a9-26eb-488a-9375-24f55afe6bee"/>
+				<textFieldExpression><![CDATA[$P{fr.pcscol.nomEtablissement}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="330" y="38" width="110" height="20" uuid="27200628-c196-4194-8070-c603a05d2345"/>
+				<text><![CDATA[Nom établissement :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="58" width="110" height="17" uuid="b2922373-335a-4f0e-a9d7-8c706a19fb7d"/>
+				<text><![CDATA[Nom resp. :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="441" y="58" width="112" height="20" uuid="c68b8e54-dd3f-4d25-ab9e-323cf9d26374"/>
+				<textFieldExpression><![CDATA[$P{fr.pcscol.nomResponsable}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="230" y="50" width="100" height="20" uuid="bf9e9256-460a-4b59-875c-d8322cdebac4"/>
+				<text><![CDATA[Paramètres ->]]></text>
+			</staticText>
 		</band>
 	</title>
 	<detail>

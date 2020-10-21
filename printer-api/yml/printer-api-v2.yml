@@ -194,6 +194,7 @@ components:
         exportType:
           type: string
           enum: [PDF, ODT, DOCX]
+          default: PDF
           description: Type of the export.
         data:
           type: object
