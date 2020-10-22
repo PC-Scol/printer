@@ -6,16 +6,7 @@ services:
     - "8080:8080"
     hostname: printer-server
     user: root
-    environment:
-      printer.template.base-url: file:///app/templates
-      printer.jasper.base-url: file:///app/templates/jasper
-      printer.jasper.unzip-folder: /tmp
-      printer.jasper.resource-folder: /app/templates/jasper
-      printer.jasper.templates[0].name: certificat
-      printer.jasper.templates[0].main: Certificat.jrxml
-      printer.jasper.templates[0].url: certificat.zip
-
     volumes:
     - type: bind
-      source: @project.projectDir@/src/test/resources/templates
-      target: /app/templates
+      source: @project.projectDir@/src/test/resources/
+      target: /app/resources/
