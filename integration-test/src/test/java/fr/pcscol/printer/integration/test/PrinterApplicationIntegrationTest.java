@@ -3,6 +3,7 @@ package fr.pcscol.printer.integration.test;
 import fr.pcscol.printer.adapter.PrinterException;
 import fr.pcscol.printer.client.api.PrinterApi;
 import fr.pcscol.printer.client.api.model.PrintMessage;
+import fr.pcscol.printer.client.v2.api.model.JasperExporterConfigParams;
 import fr.pcscol.printer.client.v2.api.model.JasperPrintMessage;
 import fr.pcscol.printer.client.v2.api.model.XdocPrintMessage;
 import org.hamcrest.Matchers;
@@ -18,6 +19,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Tests the client/server integration
@@ -86,12 +88,15 @@ public class PrinterApplicationIntegrationTest {
 
         File outFile = File.createTempFile("PrinterV2ApplicationIntegrationTest_out_", ".pdf", new File("build"));
         if (!keepFilesEnv) {
-           outFile.deleteOnExit();
+           //outFile.deleteOnExit();
         }
 
         //build PrintMessage
         PersonBean personBean = new PersonBean("Jean", "Dupont");
-        JasperPrintMessage printMessage = new JasperPrintMessage().templateName("certificat").data(personBean);
+        Map<String, Object> params = Map.of(
+                JasperExporterConfigParams.DISPLAYMETADATATITLE.getValue(), true,
+                JasperExporterConfigParams.METADATATITLE.getValue(), "Mon Certificat");
+        JasperPrintMessage printMessage = new JasperPrintMessage().templateName("certificat").data(personBean).parameters(params);
         printerApiV2.getApiClient().setBasePath("http://localhost:8080/printer/v2");
         byte[] content = printerApiV2.jasperPrint(printMessage);
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {

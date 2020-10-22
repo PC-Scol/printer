@@ -47,7 +47,7 @@ public class JasperPrinterServiceTest {
     public void generatePdfWithNestedReportTest() throws IOException {
 
         File outFile = File.createTempFile("releve_multiple_out_", ".pdf", new File("build"));
-        outFile.deleteOnExit();
+        //outFile.deleteOnExit();
 
         //json data input
         List<Object> json = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
@@ -56,6 +56,10 @@ public class JasperPrinterServiceTest {
         params.put("fr.pcscol.logo", "logo2.png");
         params.put("fr.pcscol.nomResponsable", "Jean Bernard");
         params.put("fr.pcscol.nomEtablissement", "INU Champollion");
+        params.put(JasperExporterConfigParams.METADATA_TITLE.toString(), "title of the pdf");
+        params.put(JasperExporterConfigParams.METADATA_SUBJECT.toString(), "subject");
+        params.put(JasperExporterConfigParams.METADATA_AUTHOR.toString(), "pegase");
+        params.put(JasperExporterConfigParams.METADATA_DISPLAY_TITLE.toString(), true);
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
                 printerService.generate("releveNote", data, params, JasperExportType.PDF, outputStream);

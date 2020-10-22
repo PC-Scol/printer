@@ -19,10 +19,7 @@ import net.sf.jasperreports.engine.export.oasis.JROdtExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.fill.JRFiller;
-import net.sf.jasperreports.export.SimpleExporterInput;
-import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
-import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
-import net.sf.jasperreports.export.SimplePdfReportConfiguration;
+import net.sf.jasperreports.export.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,13 +61,13 @@ public class JasperPrinterService {
             JasperPrintReport templateReport = getTemplateReport(reportName);
             //print
             Map<String, Object> reportParams = new HashMap<>();
-            if(parameters != null && !parameters.isEmpty()){
+            if (parameters != null && !parameters.isEmpty()) {
                 reportParams.putAll(parameters);
             }
             reportParams.put(JRParameter.REPORT_CONTEXT, templateReport.getContext());
             JasperPrint jasperPrint = JRFiller.fill(DefaultJasperReportsContext.getInstance(), templateReport.getSource(), reportParams, dataSource);
             //export
-            JRAbstractExporter exporter = getExporter(exportType);
+            JRAbstractExporter exporter = getExporter(exportType, parameters);
             exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
             exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
             exporter.exportReport();
@@ -84,7 +81,7 @@ public class JasperPrinterService {
         }
     }
 
-    private JRAbstractExporter getExporter(JasperExportType exportType) {
+    private JRAbstractExporter getExporter(JasperExportType exportType, Map<String, Object> parameters) {
         JRAbstractExporter exporter;
         switch (exportType) {
             case PDF:
@@ -94,15 +91,32 @@ public class JasperPrinterService {
                         = new SimplePdfReportConfiguration();
                 reportConfig.setSizePageToContent(true);
                 reportConfig.setForceLineBreakPolicy(false);
-                //export config
-                SimplePdfExporterConfiguration exportConfig
-                        = new SimplePdfExporterConfiguration();
-                exportConfig.setAllowedPermissionsHint(PRINTING);
                 exporter.setConfiguration(reportConfig);
-                exporter.setConfiguration(exportConfig);
+                //export config
+                SimplePdfExporterConfiguration pdfExporterConfiguration
+                        = new SimplePdfExporterConfiguration();
+                pdfExporterConfiguration.setAllowedPermissionsHint(JasperExporterConfigParams.ALLOWED_PERMISSIONS_HINT.getString(parameters));
+                pdfExporterConfiguration.setDeniedPermissionsHint(JasperExporterConfigParams.DENIED_PERMISSIONS_HINT.getString(parameters));
+                pdfExporterConfiguration.setMetadataAuthor(JasperExporterConfigParams.METADATA_AUTHOR.getString(parameters));
+                pdfExporterConfiguration.setMetadataCreator(JasperExporterConfigParams.METADATA_CREATOR.getString(parameters));
+                pdfExporterConfiguration.setMetadataSubject(JasperExporterConfigParams.METADATA_SUBJECT.getString(parameters));
+                pdfExporterConfiguration.setMetadataKeywords(JasperExporterConfigParams.METADATA_KEYWORDS.getString(parameters));
+                pdfExporterConfiguration.setMetadataTitle(JasperExporterConfigParams.METADATA_TITLE.getString(parameters));
+                pdfExporterConfiguration.setDisplayMetadataTitle(JasperExporterConfigParams.METADATA_DISPLAY_TITLE.getBoolean(parameters));
+                exporter.setConfiguration(pdfExporterConfiguration);
                 break;
             case DOCX:
                 exporter = new JRDocxExporter();
+                //export config
+                SimpleDocxExporterConfiguration docxExporterConfiguration
+                        = new SimpleDocxExporterConfiguration();
+                docxExporterConfiguration.setMetadataAuthor(JasperExporterConfigParams.METADATA_AUTHOR.getString(parameters));
+                docxExporterConfiguration.setMetadataSubject(JasperExporterConfigParams.METADATA_SUBJECT.getString(parameters));
+                docxExporterConfiguration.setMetadataKeywords(JasperExporterConfigParams.METADATA_KEYWORDS.getString(parameters));
+                docxExporterConfiguration.setMetadataTitle(JasperExporterConfigParams.METADATA_TITLE.getString(parameters));
+                docxExporterConfiguration.setMetadataApplication(JasperExporterConfigParams.METADATA_APPLICATION.getString(parameters));
+                docxExporterConfiguration.setEmbedFonts(JasperExporterConfigParams.EMBED_FONTS.getBoolean(parameters));
+                exporter.setConfiguration(docxExporterConfiguration);
             case ODT:
                 exporter = new JROdtExporter();
                 break;
