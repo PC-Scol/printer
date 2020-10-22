@@ -65,12 +65,12 @@ DATA_FOLDER :
 
 ### Run the image :
 ```
-docker run -u root -v DATA_FOLDER:/app/resources pcscol/printer-server
+docker run -u root -p 8080:8080 -v DATA_FOLDER:/app/resources pcscol/printer-server
 ```
 
 ## How to use
 
-The printer-server exposes a swagger UI for testing accessible at: [http://${CONTAINER_HOST}:8080/swagger-ui.html?urls.primaryName=v2](http://${CONTAINER_HOST}:8080/swagger-ui.html?urls.primaryName=v2)
+The printer-server exposes a swagger UI for testing accessible at: [http://localhost:8080/swagger-ui.html?urls.primaryName=v2](http://localhost:8080/swagger-ui.html?urls.primaryName=v2)
 You can use it to try the WS :
 
 1. Provide a body
@@ -142,8 +142,8 @@ The YAML definition is released to mavenCentral under the arfifact : __fr.pcscol
 
 ## How to build the sources 
  
-1. Build the API : gradle :printer-api:build
-2. Build the Server : gradle :printer-server:build :printer-server:jibDockerBuild
-3. Run the integration test : gradle :integration-test:build
+1. Build the API : ./gradlew :printer-api:build
+2. Build the Server : ./gradlew :printer-server:build :printer-server:jibDockerBuild
+3. Run the integration test : ./gradlew :integration-test:build
 
  
