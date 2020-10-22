@@ -49,7 +49,7 @@ public class JasperPrinterServiceTest {
     public void generatePdfWithNestedReportTest() throws IOException {
 
         File outFile = File.createTempFile("releve_multiple_out_", ".pdf", new File("build"));
-        //outFile.deleteOnExit();
+        outFile.deleteOnExit();
 
         //json data input
         List<Object> json = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
@@ -72,7 +72,7 @@ public class JasperPrinterServiceTest {
     public void generateOdtWithNestedReportTest() throws IOException {
 
         File outFile = File.createTempFile("releve_multiple_out_", ".odt", new File("build"));
-        //outFile.deleteOnExit();
+        outFile.deleteOnExit();
 
         //json data input
         List<Object> json = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);

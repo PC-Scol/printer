@@ -17,6 +17,9 @@
 			<![CDATA[listeRelevesNotes]]>
 		</queryString>
 	</subDataset>
+	<parameter name="fr.pcscol.logo" class="java.lang.String"/>
+	<parameter name="fr.pcscol.nomResponsable" class="java.lang.String"/>
+	<parameter name="fr.pcscol.nomEtablissement" class="java.lang.String"/>
 	<queryString language="json">
 		<![CDATA[etablissement.nom]]>
 	</queryString>
@@ -49,6 +52,15 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
+				<subreportParameter name="fr.pcscol.logo">
+					<subreportParameterExpression><![CDATA[$P{fr.pcscol.logo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="fr.pcscol.nomResponsable">
+					<subreportParameterExpression><![CDATA[$P{fr.pcscol.nomResponsable}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="fr.pcscol.nomEtablissement">
+					<subreportParameterExpression><![CDATA[$P{fr.pcscol.nomEtablissement}]]></subreportParameterExpression>
+				</subreportParameter>
 				<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource(".")]]></dataSourceExpression>
 				<subreportExpression><![CDATA["ReleveNoteUnitaire.jasper"]]></subreportExpression>
 			</subreport>
