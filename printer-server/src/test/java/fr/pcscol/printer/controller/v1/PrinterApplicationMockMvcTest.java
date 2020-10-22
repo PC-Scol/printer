@@ -1,10 +1,10 @@
-package fr.pcscol.printer.controller;
+package fr.pcscol.printer.controller.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pcscol.printer.PersonBean;
 import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.model.PrintMessage;
-import fr.pcscol.printer.service.PrinterService;
+import fr.pcscol.printer.service.xdoc.XdocPrinterService;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Tests the {@link PrinterController} layer.
+ * Tests the {@link PrinterV1Controller} layer.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -47,7 +47,7 @@ public class PrinterApplicationMockMvcTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private PrinterService printerService;
+    private XdocPrinterService printerService;
 
     @Value("${printer.template.base-url}")
     private String templateBaseUrl;
@@ -76,17 +76,17 @@ public class PrinterApplicationMockMvcTest {
             //mock printService call
             doAnswer((Answer<Void>) invocation ->
                     {
-                        byte[] generatedBytes = PrinterApplicationMockMvcTest.class.getResourceAsStream("/out.pdf").readAllBytes();
+                        byte[] generatedBytes = PrinterApplicationMockMvcTest.class.getResourceAsStream("/xdoc/out.pdf").readAllBytes();
                         //write generated to outputstream arg
                         ((OutputStream) invocation.getArgument(4)).write(generatedBytes);
                         //write response to outFile
                         outputStream.write(generatedBytes);
                         return null;
                     }
-            ).when(printerService).generate(eq(PrinterUtil.completeUrl("certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
+            ).when(printerService).generate(eq(PrinterUtil.completeUrl("xdoc/certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
 
             //invoke WS
-            PrintMessage printMessage = new PrintMessage().templateUrl("certificat.odt").data(personBean).convert(true);
+            PrintMessage printMessage = new PrintMessage().templateUrl("xdoc/certificat.odt").data(personBean).convert(true);
             String body = objectMapper.writeValueAsString(printMessage);
             mvc.perform(post("/printer/v1/print").contentType(MediaType.APPLICATION_JSON).content(body))
                     .andExpect(status().isOk())
@@ -143,10 +143,10 @@ public class PrinterApplicationMockMvcTest {
 
         //mock printService call
         doThrow(new DocumentGenerationException("An error occured during document generation")).when(printerService).generate(
-                eq(PrinterUtil.completeUrl("certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
+                eq(PrinterUtil.completeUrl("xdoc/certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
 
         //invoke WS
-        PrintMessage printMessage = new PrintMessage().templateUrl("certificat.odt").data(personBean).convert(true);
+        PrintMessage printMessage = new PrintMessage().templateUrl("xdoc/certificat.odt").data(personBean).convert(true);
         String body = objectMapper.writeValueAsString(printMessage);
         mvc.perform(post("/printer/v1/print").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isInternalServerError())

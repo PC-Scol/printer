@@ -1,0 +1,11 @@
+{
+  "library": "resttemplate",
+  "dateLibrary": "java8",
+  "hideGenerationTimestamp": true,
+  "invokerPackage": "fr.pcscol.printer.client.v2",
+  "modelPackage": "fr.pcscol.printer.client.v2.api.model",
+  "apiPackage": "fr.pcscol.printer.client.v2.api",
+  "interfaceOnly": true,
+  "useTags": true,
+  "useBeanValidation": true
+}

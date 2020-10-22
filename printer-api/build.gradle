@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'maven'
     id 'maven-publish'
     id 'io.spring.dependency-management'
     id 'signing'
@@ -14,7 +13,9 @@ dependencyManagement {
 }
 
 configurations {
-    apiArtifact // Artefact de l'API
+    // Artefacts des APIs
+    apiArtifactV1
+    apiArtifactV2
     swaggerCodegen // Exécutable Swagger codegen-cli
 }
 
@@ -43,25 +44,48 @@ sourceSets {
 }
 
 
-task copyInputSpec(type: Copy) {
-    from file("${projectDir}/yml/printer-api.yml").toString()
+task copyInputSpecV1(type: Copy) {
+    from file("${projectDir}/yml/printer-api-v1.yml").toString()
     into file("${buildDir}/swagger").toString()
 }
 
-def inputSpec = file("${buildDir}/swagger/printer-api.yml")
+task copyInputSpecV2(type: Copy) {
+    from file("${projectDir}/yml/printer-api-v2.yml").toString()
+    into file("${buildDir}/swagger").toString()
+}
 
-task("swaggerCodeGen", type: SwaggerCodeGenTaskV3) {
+def inputSpecV1 = file("${buildDir}/swagger/printer-api-v1.yml")
+def inputSpecV2 = file("${buildDir}/swagger/printer-api-v2.yml")
+
+task swaggerCodeGenV1(type: SwaggerCodeGenTaskV3) {
     group 'Source Generation'
     description 'Génère les sources de l\'API à partir du fichier yml.'
-    dependsOn copyInputSpec
+    dependsOn copyInputSpecV1
 
-    apiFile = inputSpec
+    apiFile = inputSpecV1
     lang = 'spring'
-    configFile = file('swaggerCodeGenSpringConfig.json')
-}
-compileJava.dependsOn swaggerCodeGen
 
-def apiArtifact = artifacts.add("apiArtifact", inputSpec) {
+    configFile = file('swaggerCodeGenV1.json')
+}
+
+task swaggerCodeGenV2(type: SwaggerCodeGenTaskV3) {
+    group 'Source Generation'
+    description 'Génère les sources de l\'API à partir du fichier yml.'
+    dependsOn copyInputSpecV2
+
+    apiFile = inputSpecV2
+    lang = 'spring'
+    configFile = file('swaggerCodeGenV2.json')
+}
+
+compileJava.dependsOn swaggerCodeGenV1
+compileJava.dependsOn swaggerCodeGenV2
+
+def apiArtifactV1 = artifacts.add("apiArtifactV1", inputSpecV1) {
+    type "yml"
+}
+
+def apiArtifactV2 = artifacts.add("apiArtifactV2", inputSpecV2) {
     type "yml"
 }
 
@@ -74,15 +98,44 @@ signing {
 
 publishing {
     publications {
-        api(MavenPublication) {
+        apiV1(MavenPublication) {
 
             groupId 'fr.pc-scol.printer'
-            artifactId 'printer-api'
-            artifact apiArtifact
+            artifactId 'printer-api-v1'
+            artifact apiArtifactV1
 
             pom {
-                name = 'printer-api'
-                description = 'The printer service API spec'
+                name = 'printer-api-v1'
+                description = 'The printer service API V1 spec'
+                url = 'https://github.com/PC-Scol/printer/'
+                licenses {
+                    license {
+                        name = 'GNU Affero General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/agpl-3.0.fr.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'zaghdous'
+                        name = 'Sabri ZAGHDOUDI'
+                        email = 'sabri.zaghdoudi@pc-scol.fr'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git@github.com:PC-Scol/printer.git'
+                    url = 'https://github.com/PC-Scol/printer'
+                }
+            }
+        }
+        apiV2(MavenPublication) {
+
+            groupId 'fr.pc-scol.printer'
+            artifactId 'printer-api-v2'
+            artifact apiArtifactV2
+
+            pom {
+                name = 'printer-api-v2'
+                description = 'The printer service API V2 spec'
                 url = 'https://github.com/PC-Scol/printer/'
                 licenses {
                     license {

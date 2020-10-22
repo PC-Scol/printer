@@ -6,9 +6,7 @@ services:
     - "8080:8080"
     hostname: printer-server
     user: root
-    environment:
-      printer.template.base-url: file:///app/templates
     volumes:
     - type: bind
-      source: @project.projectDir@/src/test/resources/templates
-      target: /app/templates
+      source: @project.projectDir@/src/test/resources/
+      target: /app/resources/

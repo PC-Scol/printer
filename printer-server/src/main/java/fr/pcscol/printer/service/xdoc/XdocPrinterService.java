@@ -1,4 +1,4 @@
-package fr.pcscol.printer.service;
+package fr.pcscol.printer.service.xdoc;
 
 import fr.opensagres.xdocreport.converter.ConverterTypeTo;
 import fr.opensagres.xdocreport.converter.Options;
@@ -10,9 +10,6 @@ import fr.opensagres.xdocreport.template.TemplateEngineKind;
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
 import fr.opensagres.xdocreport.template.formatter.NullImageBehaviour;
 import fr.pcscol.printer.PrinterUtil;
-import fr.pcscol.printer.api.model.FieldMetadata;
-import fr.pcscol.printer.api.model.ImageFieldMetadata;
-import fr.pcscol.printer.api.model.TextStylingFieldMetadata;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.slf4j.Logger;
@@ -31,9 +28,9 @@ import java.util.Map;
  * It uses the XDocReport library to make that.
  */
 @Service
-public class PrinterService {
+public class XdocPrinterService {
 
-    private Logger logger = LoggerFactory.getLogger(PrinterService.class);
+    private Logger logger = LoggerFactory.getLogger(XdocPrinterService.class);
 
     /**
      * report/template registry used to load and cache reports
@@ -69,7 +66,7 @@ public class PrinterService {
      * @throws TemplateNotFoundException   if the provided url does not reference a valid template
      * @throws DocumentGenerationException if any error occurs during the document generation
      */
-    public void generate(URL templateUrl, Map<String, Object> data, List<FieldMetadata> fieldMetadataList, boolean convert, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {
+    public void generate(URL templateUrl, Map<String, Object> data, List<XdocFieldMetadata> fieldMetadataList, boolean convert, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {
 
         logger.debug("New document generation is requested with template={}, data={}, convert={}", templateUrl, data, convert);
         IXDocReport templateReport = getTemplateReport(templateUrl);
@@ -101,13 +98,13 @@ public class PrinterService {
      * @param metadataList         the input metadata
      * @param reportFieldsMetadata the report metadata to fill
      */
-    private void fillReportFieldsMetadata(List<FieldMetadata> metadataList, FieldsMetadata reportFieldsMetadata) {
-        for (FieldMetadata metadata : metadataList) {
-            if (metadata instanceof TextStylingFieldMetadata) {
-                TextStylingFieldMetadata textStylingFieldMetadata = (TextStylingFieldMetadata) metadata;
+    private void fillReportFieldsMetadata(List<XdocFieldMetadata> metadataList, FieldsMetadata reportFieldsMetadata) {
+        for (XdocFieldMetadata metadata : metadataList) {
+            if (metadata instanceof XdocTextStylingFieldMetadata) {
+                XdocTextStylingFieldMetadata textStylingFieldMetadata = (XdocTextStylingFieldMetadata) metadata;
                 reportFieldsMetadata.addFieldAsTextStyling(textStylingFieldMetadata.getFieldName(), textStylingFieldMetadata.getSyntaxKind().toString(), Boolean.TRUE.equals(textStylingFieldMetadata.isSyntaxWithDirective()));
-            } else if (metadata instanceof ImageFieldMetadata) {
-                ImageFieldMetadata imageFieldMetadata = (ImageFieldMetadata) metadata;
+            } else if (metadata instanceof XdocImageFieldMetadata) {
+                XdocImageFieldMetadata imageFieldMetadata = (XdocImageFieldMetadata) metadata;
                 reportFieldsMetadata.addFieldAsImage(imageFieldMetadata.getFieldName(), NullImageBehaviour.valueOf(imageFieldMetadata.getNullImageBehaviour().toString()), Boolean.TRUE.equals(imageFieldMetadata.isUseImageSize()));
             }
             if (Boolean.TRUE.equals(metadata.isListType())) {

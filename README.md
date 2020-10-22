@@ -1,34 +1,81 @@
 # printer
+
 A Spring-Boot micro-service for generating documents (odt, docx, doc, pdf).
-The service internally uses [XDocReport](https://github.com/opensagres/xdocreport/wiki) to generate and convert documents, we encourage you to read about it!
+The service provides two end-points :
+- '/print/xdoc' which provides generation based on [XDocReport](https://github.com/opensagres/xdocreport/wiki) .
+- '/print/jasper' which provides generation based on [JasperReports Library](https://community.jaspersoft.com/project/jasperreports-library) .
 
-The generation process takes in input :
-- A template (odt, docx, doc) with Freemarker placeholders
-- A data model<br>
+Depending on the selected implementation, you need to provide a compatible template file :
+- XDocReport : odt, docx, doc document with Freemarker placeholders.
+- JasperReport : zip archive containing JRXML files (for main report and subreports).
 
-Then merge it to produce a document containing the data.
+And a data model. Then the merge process will produce a document (odt, docx, doc, pdf) containing the data.
 
 ![Generation process!](assets/process_generation.png "Generation process") 
 
 
 ## How to run
 
-Pull the latest docker image :
+### Pull the latest docker image :
 ```
 docker pull pcscol/printer-server
 ```
-Run the image :
+
+### Configure the application.yml :
 ```
-docker run -u root -e printer.template.base-url=$TEMPLATE_BASE_URL pcscol/printer-server
+printer:
+  template:
+    base-url: file:///app/resources/templates/xdoc
+  jasper:
+    base-url: file:///app/resources/templates/jasper
+    unzip-folder: /tmp
+    resource-folder: /app/resources/templates/jasper
+    templates:
+      - name: certificat
+        main: Certificat.jrxml
+        url: certificat.zip  
+```
+
+- printer.template.base-url : base url for xdoc templates
+- printer.jasper: 
+    - base-url : base url for jasper templates
+    - unzip-folder : temp folder for unzipping jasper archives
+    - resource-folder : folder for shared resources (which may be used in templates)
+    - templates : list of managed jasper templates
+        - url : the url to the template zip archive (may be relative to printer.jasper.base-url)
+        - name : the name of the template (which is also the name of the unzipped folder)
+        - main : the main report jrxml file
+
+### Configure a volume :
+
+Configure a folder containing your templates resources and configuration :
+
+DATA_FOLDER : 
+```
+.
+├── application.yml
+└── templates
+    ├── xdoc
+        └── certificat.odt
+    └── jasper
+        └── certificat.zip
+```
+
+
+
+### Run the image :
+```
+docker run -u root -p 8080:8080 -v DATA_FOLDER:/app/resources pcscol/printer-server
 ```
 
 ## How to use
 
-The printer-server exposes a swagger UI for testing accessible at: [http://${CONTAINER_HOST}:8080/swagger-ui.html](http://${CONTAINER_HOST}:8080/swagger-ui.html)
+The printer-server exposes a swagger UI for testing accessible at: [http://localhost:8080/swagger-ui.html?urls.primaryName=v2](http://localhost:8080/swagger-ui.html?urls.primaryName=v2)
 You can use it to try the WS :
 
 1. Provide a body
 
+- A XdocPrintMessage if you use the "/print/xdoc" end-point :
 ```
 {
   // 1 : Tell if the generated document must be converted to pdf or just keep the template format  
@@ -45,12 +92,28 @@ You can use it to try the WS :
   ]
 }
 ```
+- Or a JasperPrintMessage if you use the "/print/jasper" end-point :
+```
+{
+  // 1 : Tell the type of the exported document : PDF, DOCX, ODT (default is PDF)  
+  "exportType": "PDF",
+
+  // 2 : The name of the template (which is also the name of the unzipped folder).  
+  "templateName": "certificat"   
+
+  // 3 : The data to merge within the document  
+  "data": {"firstName" : "John", "lastName" : "Doe"},
+  // 4 : map of additional parameters which may be used in the template
+  "parameters": {"logo_path" : "path/to/logo.gif"}
+}
+```
+
 2. Set the expected response content type (application/pdf in our case)
 3. Click 'Execute'. You should receive a 200 http response, and a link to download the generated document should appear.
 
 NB : In the case where the downloaded file is corrupted use curl instead.
 
-### The fieldsMetadata purpose
+### The fieldsMetadata purpose (XDocReport only)
 
 Fields metadata are used to add styling and rendering behaviour to some fields.
 You can find here some documentation about it :
@@ -59,7 +122,7 @@ You can find here some documentation about it :
 - [Dynamic image rendering](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainDynamicImage)
 - List rendering : [here](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainListFieldInTable) and [here](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainListFieldAdvancedTable)
 
-### Input template formatting
+### Input template formatting (XDocReport only)
 
 The Printer Service expects input templates using the [FreeMarker](https://freemarker.apache.org/) syntax.
 
@@ -79,8 +142,8 @@ The YAML definition is released to mavenCentral under the arfifact : __fr.pcscol
 
 ## How to build the sources 
  
-1. Build the API : gradle :printer-api:build
-2. Build the Server : gradle :printer-server:build :printer-server:jibDockerBuild
-3. Run the integration test : gradle :integration-test:build
+1. Build the API : ./gradlew :printer-api:build
+2. Build the Server : ./gradlew :printer-server:build :printer-server:jibDockerBuild
+3. Run the integration test : ./gradlew :integration-test:build
 
  

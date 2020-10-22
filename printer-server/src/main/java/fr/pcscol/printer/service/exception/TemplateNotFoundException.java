@@ -1,6 +1,6 @@
 package fr.pcscol.printer.service.exception;
 
-public class TemplateNotFoundException extends Exception {
+public class TemplateNotFoundException extends RuntimeException {
 
     public TemplateNotFoundException(){}
 

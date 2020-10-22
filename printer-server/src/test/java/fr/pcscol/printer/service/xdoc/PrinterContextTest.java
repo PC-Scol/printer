@@ -1,8 +1,9 @@
-package fr.pcscol.printer.service;
+package fr.pcscol.printer.service.xdoc;
 
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
 import fr.opensagres.xdocreport.template.formatter.NullImageBehaviour;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
+import fr.pcscol.printer.service.xdoc.PrinterContext;
 import org.junit.Assert;
 import org.junit.Test;
 

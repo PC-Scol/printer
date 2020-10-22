@@ -1,4 +1,4 @@
-package fr.pcscol.printer.service;
+package fr.pcscol.printer.service.xdoc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -7,8 +7,10 @@ import fr.pcscol.printer.PersonBean;
 import fr.pcscol.printer.api.model.FieldMetadata;
 import fr.pcscol.printer.api.model.ImageFieldMetadata;
 import fr.pcscol.printer.api.model.TextStylingFieldMetadata;
+import fr.pcscol.printer.controller.v1.PrinterV1Controller;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -27,20 +29,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Tests the {@link PrinterService} layer.
+ * Tests the {@link XdocPrinterService} layer.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class PrinterServiceTest {
+public class XdocPrinterServiceTest {
+
+    static {
+        TomcatURLStreamHandlerFactory.getInstance();
+    }
 
     @Autowired
-    private PrinterService printerService;
+    private XdocPrinterService printerService;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Value("${printer.template.base-url}")
-    private String templateBaseUrl;
 
 
     /**
@@ -55,7 +58,7 @@ public class PrinterServiceTest {
         outFile.deleteOnExit();
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/certificat.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/certificat.odt");
         //data
         PersonBean personBean = new PersonBean("Jean", "Dupont");
         Map<String, Object> map = objectMapper.convertValue(personBean, Map.class);
@@ -81,7 +84,7 @@ public class PrinterServiceTest {
         outFile.deleteOnExit();
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/certificat.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/certificat.odt");
         //data
         PersonBean personBean = new PersonBean("Jean", "Dupont");
         Map<String, Object> map = objectMapper.convertValue(personBean, Map.class);
@@ -127,7 +130,7 @@ public class PrinterServiceTest {
     public void generateWithTemplateNotAllowedTest() {
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_not_allowed.txt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_not_allowed.txt");
         //data
         PersonBean personBean = new PersonBean("Jean", "Dupont");
         Map<String, Object> map = objectMapper.convertValue(personBean, Map.class);
@@ -153,20 +156,20 @@ public class PrinterServiceTest {
         outFile.deleteOnExit();
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata.odt");
         //data
         Map<String, Object> map = new HashMap<>();
         map.put("o1", new HashMap<>());
-        map.put("logo", new ClassPathImageProvider(PrinterServiceTest.class, "/logo.gif"));
+        map.put("logo", new ClassPathImageProvider(XdocPrinterServiceTest.class, "/xdoc/logo.gif"));
         map.put("items", Lists.newArrayList("item1", "item2", "item3"));
         map.put("url", "http://google.com");
         map.put("link", "<a href=\"${url}\">Google</a> ");
 
         //metadata
-        List<FieldMetadata> fieldMetadataList = new ArrayList<>();
-        fieldMetadataList.add(new FieldMetadata().fieldName("items").listType(true));
-        fieldMetadataList.add(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.KEEPIMAGETEMPLATE).fieldName("logo"));
-        fieldMetadataList.add(new TextStylingFieldMetadata().syntaxKind(TextStylingFieldMetadata.SyntaxKindEnum.HTML).syntaxWithDirective(true).fieldName("link"));
+        List<XdocFieldMetadata> fieldMetadataList = new ArrayList<>();
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new FieldMetadata().fieldName("items").listType(true)));
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.KEEPIMAGETEMPLATE).fieldName("logo")));
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new TextStylingFieldMetadata().syntaxKind(TextStylingFieldMetadata.SyntaxKindEnum.HTML).syntaxWithDirective(true).fieldName("link")));
 
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
@@ -189,10 +192,10 @@ public class PrinterServiceTest {
         outFile.deleteOnExit();
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata_nesting.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata_nesting.odt");
         //data
         String image;
-        try (InputStream inputStream = this.getClass().getResourceAsStream("/logo.gif")) {
+        try (InputStream inputStream = this.getClass().getResourceAsStream("/xdoc/logo.gif")) {
             image = Base64.encode(inputStream.readAllBytes());
         }
         PrinterContext printerContext = new PrinterContext();
@@ -203,11 +206,11 @@ public class PrinterServiceTest {
         printerContext.put("o1.link", "<a href=\"${o1.url}\">Google</a> ");
 
         //metadata
-        List<FieldMetadata> fieldMetadataList = new ArrayList<>();
-        fieldMetadataList.add(new FieldMetadata().fieldName("items").listType(true));
-        fieldMetadataList.add(new FieldMetadata().fieldName("o1.items").listType(true));
-        fieldMetadataList.add(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.KEEPIMAGETEMPLATE).fieldName("o1.o2.logo"));
-        fieldMetadataList.add(new TextStylingFieldMetadata().syntaxKind(TextStylingFieldMetadata.SyntaxKindEnum.HTML).syntaxWithDirective(true).fieldName("o1.link"));
+        List<XdocFieldMetadata> fieldMetadataList = new ArrayList<>();
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new FieldMetadata().fieldName("items").listType(true)));
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new FieldMetadata().fieldName("o1.items").listType(true)));
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.KEEPIMAGETEMPLATE).fieldName("o1.o2.logo")));
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new TextStylingFieldMetadata().syntaxKind(TextStylingFieldMetadata.SyntaxKindEnum.HTML).syntaxWithDirective(true).fieldName("o1.link")));
 
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
@@ -226,17 +229,17 @@ public class PrinterServiceTest {
     public void generateWithFieldsMetadataNotListErrorTest() {
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata.odt");
         //data
         Map<String, Object> map = new HashMap<>();
-        map.put("logo", new ClassPathImageProvider(PrinterServiceTest.class, "/logo.gif"));
+        map.put("logo", new ClassPathImageProvider(XdocPrinterServiceTest.class, "/xdoc/logo.gif"));
         //NOT LIST
         map.put("items", "singleItem");
 
         //metadata
-        List<FieldMetadata> fieldMetadataList = new ArrayList<>();
-        fieldMetadataList.add(new FieldMetadata().fieldName("items").listType(true));
-        fieldMetadataList.add(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.KEEPIMAGETEMPLATE).fieldName("logo"));
+        List<XdocFieldMetadata> fieldMetadataList = new ArrayList<>();
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new FieldMetadata().fieldName("items").listType(true)));
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.KEEPIMAGETEMPLATE).fieldName("logo")));
 
         try {
             printerService.generate(templateUrl, map, fieldMetadataList, false, null);
@@ -256,16 +259,16 @@ public class PrinterServiceTest {
     public void generateWithFieldsMetadataImageNotFoundErrorTest() {
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata.odt");
         //data
         Map<String, Object> map = new HashMap<>();
-        map.put("logo", new ClassPathImageProvider(PrinterServiceTest.class, "/unknown.gif"));
+        map.put("logo", new ClassPathImageProvider(XdocPrinterServiceTest.class, "/unknown.gif"));
         map.put("items", Lists.newArrayList());
 
         //metadata
-        List<FieldMetadata> fieldMetadataList = new ArrayList<>();
-        fieldMetadataList.add(new FieldMetadata().fieldName("items").listType(true));
-        fieldMetadataList.add(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.THROWSERROR).fieldName("logo"));
+        List<XdocFieldMetadata> fieldMetadataList = new ArrayList<>();
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new FieldMetadata().fieldName("items").listType(true)));
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.THROWSERROR).fieldName("logo")));
 
         try {
             printerService.generate(templateUrl, map, fieldMetadataList, false, null);
@@ -285,16 +288,16 @@ public class PrinterServiceTest {
     public void generateWithFieldsMetadataImageBadlyEncodedErrorTest() {
 
         //templateUrl
-        URL templateUrl = this.getClass().getResource("/template_metadata.odt");
+        URL templateUrl = this.getClass().getResource("/xdoc/template_metadata.odt");
         //data
         PrinterContext printerContext = new PrinterContext();
         printerContext.put("logo", new Object());
         printerContext.put("items", Lists.newArrayList("item1", "item2", "item3"));
 
         //metadata
-        List<FieldMetadata> fieldMetadataList = new ArrayList<>();
-        fieldMetadataList.add(new FieldMetadata().fieldName("items").listType(true));
-        fieldMetadataList.add(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.THROWSERROR).fieldName("logo"));
+        List<XdocFieldMetadata> fieldMetadataList = new ArrayList<>();
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new FieldMetadata().fieldName("items").listType(true)));
+        fieldMetadataList.add(PrinterV1Controller.toXdocFieldMetadata.apply(new ImageFieldMetadata().nullImageBehaviour(ImageFieldMetadata.NullImageBehaviourEnum.THROWSERROR).fieldName("logo")));
 
         try {
             printerService.generate(templateUrl, printerContext.getContextMap(), fieldMetadataList, false, null);
