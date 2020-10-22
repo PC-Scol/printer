@@ -113,6 +113,11 @@ You can use it to try the WS :
 
 NB : In the case where the downloaded file is corrupted use curl instead.
 
+### The Jasper Exporter Configuration
+
+The parameters map may also contain some configuration to apply to the jasper exporter (See [SimplePdfExporterConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimplePdfExporterConfiguration.html) and [SimpleDocxExporterConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimpleDocxExporterConfiguration.html)).
+The list of the managed properties is described in the JasperExporterConfigParams enum : ["exporter.allowedPermissionsHint", "exporter.deniedPermissionsHint", "exporter.metadataTitle", "exporter.metadataAuthor", "exporter.metadataSubject", "exporter.metadataKeywords", "exporter.metadataCreator", "exporter.displayMetadataTitle", "exporter.embedFonts", "exporter.metadataApplication"]
+
 ### The fieldsMetadata purpose (XDocReport only)
 
 Fields metadata are used to add styling and rendering behaviour to some fields.
