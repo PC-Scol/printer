@@ -104,7 +104,7 @@ You can use it to try the WS :
   // 3 : The data to merge within the document  
   "data": {"firstName" : "John", "lastName" : "Doe"},
   // 4 : map of additional parameters which may be used in the template
-  "parameters": {"logo_path" : "path/to/logo.gif"}
+  "parameters": {"logo_path" : "path/to/logo.gif", "exporter.metadataTitle" : "Certificat de scolarité"}
 }
 ```
 
