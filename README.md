@@ -106,7 +106,7 @@ You can use it to try the WS :
   "data": {"firstName" : "John", "lastName" : "Doe"},
 
   // 4 : map of additional parameters which may be used in the template
-  "parameters": {"logo_path" : "path/to/logo.gif", "exporter.metadataTitle" : "Certificat de scolarité"}
+  "parameters": {"logo_path" : "path/to/logo.gif", "exporter.all.export.metadataTitle" : "Certificat de scolarité"}
 }
 ```
 
@@ -117,8 +117,32 @@ NB : In the case where the downloaded file is corrupted use curl instead.
 
 ### The Jasper Exporter Configuration
 
-The parameters map may also contain some configuration to apply to the jasper exporter (See [SimplePdfExporterConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimplePdfExporterConfiguration.html) and [SimpleDocxExporterConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimpleDocxExporterConfiguration.html)).
-The list of the managed properties is described in the **JasperExporterConfigParams** enum : ["exporter.allowedPermissionsHint", "exporter.deniedPermissionsHint", "exporter.metadataTitle", "exporter.metadataAuthor", "exporter.metadataSubject", "exporter.metadataKeywords", "exporter.metadataCreator", "exporter.displayMetadataTitle", "exporter.embedFonts", "exporter.metadataApplication"]
+The parameters map may also contain some configuration to apply to the jasper exporter.
+
+- For PDF export see [SimplePdfReportConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimplePdfReportConfiguration.html) and [SimplePdfExporterConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimplePdfExporterConfiguration.html).
+- For DOCX export see [SimpleDocxReportConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimpleDocxReportConfiguration.html) and [SimpleDocxExporterConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimpleDocxExporterConfiguration.html).
+- For CSV export see [SimpleCsvReportConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimpleCsvReportConfiguration.html) and [SimpleCsvMetadataExporterConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimpleCsvExporterConfiguration.html).
+
+The list of all the managed properties is described by the enum **JasperExporterConfigParams** in the API :
+
+- "exporter.pdf.report.forceSvgShapes"
+- "exporter.pdf.report.sizePageToContent"
+- "exporter.pdf.report.forceLineBreakPolicy"
+- "exporter.pdf.export.allowedPermissionsHint"
+- "exporter.pdf.export.deniedPermissionsHint"
+- "exporter.pdf.export.metadataCreator"
+- "exporter.pdf.export.displayMetadataTitle"
+- "exporter.all.export.metadataTitle"
+- "exporter.all.export.metadataAuthor"
+- "exporter.all.export.metadataSubject"
+- "exporter.all.export.metadataKeywords"
+- "exporter.docx.export.metadataApplication"
+- "exporter.docx.export.embedFonts"
+- "exporter.csv.export.writeBom"
+- "exporter.csv.export.fieldEnclosure"
+- "exporter.csv.export.forceFieldEnclosure"
+- "exporter.csv.export.recordDelimiter"
+- "exporter.csv.export.fieldDelimiter"
 
 ### The fieldsMetadata purpose (XDocReport only)
 

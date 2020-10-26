@@ -56,10 +56,10 @@ public class JasperPrinterServiceTest {
         params.put("fr.pcscol.logo", "logo2.png");
         params.put("fr.pcscol.nomResponsable", "Jean Bernard");
         params.put("fr.pcscol.nomEtablissement", "INU Champollion");
-        params.put(JasperExporterConfigParams.METADATA_TITLE.toString(), "title of the pdf");
-        params.put(JasperExporterConfigParams.METADATA_SUBJECT.toString(), "subject");
-        params.put(JasperExporterConfigParams.METADATA_AUTHOR.toString(), "pegase");
-        params.put(JasperExporterConfigParams.METADATA_DISPLAY_TITLE.toString(), true);
+        params.put(JasperExporterConfigParams.ALL_EXPORT_METADATA_TITLE.toString(), "title of the pdf");
+        params.put(JasperExporterConfigParams.ALL_EXPORT_METADATA_SUBJECT.toString(), "subject");
+        params.put(JasperExporterConfigParams.ALL_EXPORT_METADATA_AUTHOR.toString(), "pegase");
+        params.put(JasperExporterConfigParams.PDF_EXPORT_METADATA_DISPLAY_TITLE.toString(), true);
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
                 printerService.generate("releveNote", data, params, JasperExportType.PDF, outputStream);
@@ -86,6 +86,31 @@ public class JasperPrinterServiceTest {
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             try {
                 printerService.generate("releveNote", data, null, JasperExportType.ODT, outputStream);
+                Assert.assertThat(outFile.length(), Matchers.greaterThan(0L));
+            } catch (Exception e) {
+                Assert.fail(e.getMessage());
+            }
+        }
+    }
+
+    @Test
+    public void generatCsvWithNestedReportTest() throws IOException {
+
+        File outFile = File.createTempFile("releve_multiple_out_", ".csv", new File("build"));
+        outFile.deleteOnExit();
+
+        //json data input
+        List<Object> json = objectMapper.readValue(this.getClass().getResourceAsStream("/jasper/releveNote/releveNoteMultiple.json"), ArrayList.class);
+        JsonNode data = objectMapper.convertValue(json, JsonNode.class);
+        Map<String, Object> params = new HashMap<>();
+        params.put("fr.pcscol.logo", "logo.gif");
+        params.put("fr.pcscol.nomResponsable", "Jean Bernard");
+        params.put("fr.pcscol.nomEtablissement", "INU Champollion");
+        params.put(JasperExporterConfigParams.CSV_EXPORT_RECORD_DELIMITER.toString(), "\n");
+        params.put(JasperExporterConfigParams.CSV_EXPORT_FIELD_DELIMITER.toString(), ";");
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
+            try {
+                printerService.generate("releveNote", data, null, JasperExportType.CSV, outputStream);
                 Assert.assertThat(outFile.length(), Matchers.greaterThan(0L));
             } catch (Exception e) {
                 Assert.fail(e.getMessage());

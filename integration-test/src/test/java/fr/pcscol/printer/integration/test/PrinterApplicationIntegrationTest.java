@@ -94,8 +94,8 @@ public class PrinterApplicationIntegrationTest {
         //build PrintMessage
         PersonBean personBean = new PersonBean("Jean", "Dupont");
         Map<String, Object> params = Map.of(
-                JasperExporterConfigParams.DISPLAYMETADATATITLE.getValue(), true,
-                JasperExporterConfigParams.METADATATITLE.getValue(), "Mon Certificat");
+                JasperExporterConfigParams.PDF_EXPORT_DISPLAYMETADATATITLE.getValue(), true,
+                JasperExporterConfigParams.ALL_EXPORT_METADATATITLE.getValue(), "Mon Certificat");
         JasperPrintMessage printMessage = new JasperPrintMessage().templateName("certificat").data(personBean).parameters(params);
         printerApiV2.getApiClient().setBasePath("http://localhost:8080/printer/v2");
         byte[] content = printerApiV2.jasperPrint(printMessage);

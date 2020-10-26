@@ -184,7 +184,26 @@ components:
       description: visit this [link](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainTextStyling)
     JasperExporterConfigParams:
       type: string
-      enum: ["exporter.allowedPermissionsHint", "exporter.deniedPermissionsHint", "exporter.metadataTitle", "exporter.metadataAuthor", "exporter.metadataSubject", "exporter.metadataKeywords", "exporter.metadataCreator", "exporter.displayMetadataTitle", "exporter.embedFonts", "exporter.metadataApplication"]
+      description: list of parameters used to configure the jasper exporter (pdf, docx, csv).
+      enum:
+        - "exporter.pdf.report.forceSvgShapes"
+        - "exporter.pdf.report.sizePageToContent"
+        - "exporter.pdf.report.forceLineBreakPolicy"
+        - "exporter.pdf.export.allowedPermissionsHint"
+        - "exporter.pdf.export.deniedPermissionsHint"
+        - "exporter.pdf.export.metadataCreator"
+        - "exporter.pdf.export.displayMetadataTitle"
+        - "exporter.all.export.metadataTitle"
+        - "exporter.all.export.metadataAuthor"
+        - "exporter.all.export.metadataSubject"
+        - "exporter.all.export.metadataKeywords"
+        - "exporter.docx.export.metadataApplication"
+        - "exporter.docx.export.embedFonts"
+        - "exporter.csv.report.writeHeader"
+        - "exporter.csv.export.fieldEnclosure"
+        - "exporter.csv.export.forceFieldEnclosure"
+        - "exporter.csv.export.recordDelimiter"
+        - "exporter.csv.export.fieldDelimiter"
     JasperPrintMessage:
       type: object
       required:
@@ -196,7 +215,7 @@ components:
           description: Name of the template used for the generation (name of the provided zip file).
         exportType:
           type: string
-          enum: [PDF, ODT, DOCX]
+          enum: [PDF, ODT, DOCX, CSV]
           default: PDF
           description: Type of the export.
         data:
@@ -206,6 +225,5 @@ components:
           type: object
           additionalProperties:
             type: object
-          description: "map of additional parameters that may be referenced within the template. Furthermore the jasper service handles a defined list of parameters used to configure the exported document metadata and permissions.
-          See [SimplePdfExporterConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimplePdfExporterConfiguration.html) and [SimpleDocxExporterConfiguration](http://jasperreports.sourceforge.net/api/net/sf/jasperreports/export/SimpleDocxExporterConfiguration.html).
-          The managed parameter list is enumerated within JasperExporterConfigParams"
+          description: "map of additional parameters that may be referenced within the template.
+          Furthermore the jasper service handles a defined list of parameters (JasperExporterConfigParams) used to configure the jasper exporter (see [The Jasper Exporter Configuration](https://github.com/PC-Scol/printer#the-jasper-exporter-configuration))."
