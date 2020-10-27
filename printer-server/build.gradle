@@ -32,6 +32,10 @@ dependencies {
 
     //jasperreport
     implementation("net.sf.jasperreports:jasperreports:${jasperReportsVersion}")
+    implementation("net.sf.jasperreports:jasperreports-functions:${jasperReportsVersion}")
+    implementation("net.sf.jasperreports:jasperreports-fonts:${jasperReportsVersion}")
+    implementation("net.sf.jasperreports:jasperreports-metadata:${jasperReportsVersion}")
+    implementation("org.apache.xmlgraphics:batik-bridge:${batikVersion}")
 
     // Swagger
     implementation "io.springfox:springfox-swagger2:${springfoxSwagger2Version}"
