@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pcscol.printer.PersonBean;
 import fr.pcscol.printer.PrinterUtil;
-import fr.pcscol.printer.api.model.PrintMessage;
+import fr.pcscol.printer.api.v2.model.FreemarkerPrintMessage;
 import fr.pcscol.printer.api.v2.model.JasperPrintMessage;
 import fr.pcscol.printer.api.v2.model.XdocPrintMessage;
 import fr.pcscol.printer.controller.v1.PrinterV1Controller;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
+import fr.pcscol.printer.service.freemarker.FreemarkerPrinterService;
 import fr.pcscol.printer.service.jasper.JasperExportType;
 import fr.pcscol.printer.service.jasper.JasperPrinterService;
 import fr.pcscol.printer.service.xdoc.XdocPrinterService;
@@ -57,6 +58,9 @@ public class PrinterV2ApplicationMockMvcTest {
 
     @MockBean
     private JasperPrinterService jasperPrinterService;
+
+    @MockBean
+    private FreemarkerPrinterService freemarkerPrinterService;
 
     @Value("${printer.template.base-url}")
     private String templateBaseUrl;
@@ -252,5 +256,45 @@ public class PrinterV2ApplicationMockMvcTest {
         mvc.perform(post("/printer/v2/print/jasper").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isInternalServerError())
                 .andExpect(status().reason("An error occured during document generation"));
+    }
+
+    @Test
+    public void freemarkerPrint_OkTest() throws Exception {
+
+        File outFile = File.createTempFile("PrinterV2ApplicationMockMvcTest_out_", ".csv", new File("build"));
+        if (!keepFilesEnv) {
+            outFile.deleteOnExit();
+        }
+
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
+
+            //data
+            Object personBean = new PersonBean("Jean", "Dupont");
+
+            //mock printService call
+            doAnswer((Answer<Void>) invocation ->
+                    {
+                        byte[] generatedBytes = PrinterV2ApplicationMockMvcTest.class.getResourceAsStream("/freemarker/out.csv").readAllBytes();
+                        //write generated to outputstream arg
+                        ((OutputStream) invocation.getArgument(2)).write(generatedBytes);
+                        //write response to outFile
+                        outputStream.write(generatedBytes);
+                        outputStream.flush();
+                        return null;
+                    }
+            ).when(freemarkerPrinterService).generate(eq("certificat.csv"), any(Object.class), any(OutputStream.class));
+
+            //invoke WS
+            FreemarkerPrintMessage printMessage = new FreemarkerPrintMessage().templateName("certificat.csv").data(personBean);
+            String body = objectMapper.writeValueAsString(printMessage);
+            mvc.perform(post("/printer/v2/print/freemarker").contentType(MediaType.APPLICATION_JSON).content(body))
+                    .andExpect(status().isOk())
+                    //check content types
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                    //compare content bytes
+                    .andExpect(content().bytes(new FileInputStream(outFile).readAllBytes()))
+            ;
+            Assert.assertThat(outFile.length(), Matchers.greaterThan(0L));
+        }
     }
 }

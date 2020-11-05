@@ -27,11 +27,16 @@ public class FreemarkerPrinterService {
     private Configuration configuration;
 
     @PostConstruct
-    public void init() throws IOException {
-        configuration = new Configuration(Configuration.VERSION_2_3_29);
-        configuration.setDirectoryForTemplateLoading(new File(basePath));
-        configuration.setDefaultEncoding("UTF-8");
-        configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+    public void init() {
+
+        try {
+            configuration = new Configuration(Configuration.VERSION_2_3_29);
+            configuration.setDirectoryForTemplateLoading(new File(basePath));
+            configuration.setDefaultEncoding("UTF-8");
+            configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        }catch (IOException e){
+            logger.warn("Templates base directory not found !!!");
+        }
     }
 
     public void generate(String templateName, Object data, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {

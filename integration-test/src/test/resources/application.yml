@@ -1,6 +1,8 @@
 printer:
   template:
     base-url: file:///app/resources/templates/xdoc
+  freemarker:
+    base-path: /app/resources/templates/freemarker
   jasper:
     base-url: file:///app/resources/templates/jasper
     unzip-folder: /tmp

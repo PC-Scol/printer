@@ -57,6 +57,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/print/freemarker':
+    post:
+      tags:
+      - Printer
+      summary: Produces a plain text document by merging the freemarker template and data provided within the FreemarkerPrintMessage
+      operationId: freemarkerPrint
+      requestBody:
+        description: A FreemarkerPrintMessage
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FreemarkerPrintMessage'
+      responses:
+        '200':
+          description: Document has been successfully generated
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: byte
+        '400':
+          description: Bad request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Template not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   '/print/jasper':
     post:
       tags:
@@ -227,3 +260,15 @@ components:
             type: object
           description: "map of additional parameters that may be referenced within the template.
           Furthermore the jasper service handles a defined list of parameters (JasperExporterConfigParams) used to configure the jasper exporter (see [The Jasper Exporter Configuration](https://github.com/PC-Scol/printer#the-jasper-exporter-configuration))."
+    FreemarkerPrintMessage:
+      type: object
+      required:
+      - templateName
+      - data
+      properties:
+        templateName:
+          type: string
+          description: Name of the template used for the generation.
+        data:
+          type: object
+          description: The data model to merge.

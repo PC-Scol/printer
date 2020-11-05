@@ -30,6 +30,8 @@ public final class PrinterUtil {
         mimeMap.put("odt", "application/vnd.oasis.opendocument.text");
         mimeMap.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         mimeMap.put("doc", "application/msword");
+        mimeMap.put("csv", "text/plain");
+        mimeMap.put("txt", "text/plain");
     }
 
     public static final String SLASH = "/";
@@ -64,6 +66,10 @@ public final class PrinterUtil {
          */
         String ext = fileName.substring(fileName.lastIndexOf(DOT) + 1);
         return mimeMap.get(ext);
+    }
+
+    public static final String getExt(String fileName) {
+        return fileName.substring(fileName.lastIndexOf(DOT) + 1);
     }
 
     public static final String getMimeType(JasperExportType exportType) {
@@ -135,5 +141,12 @@ public final class PrinterUtil {
             String err = String.format("Unable to load template file @ %s.", templateUrl);
             throw e;
         }
+    }
+
+    public static String extractOutputFileNameByExt(String templateName, String suffix, String extension) {
+
+        return new StringBuilder(templateName.contains(PrinterUtil.DOT) ? templateName.substring(templateName.lastIndexOf(PrinterUtil.DOT) + 1) : templateName)
+                .append(PrinterUtil.UNDERSCORE).append(suffix).append(PrinterUtil.DOT)
+                .append(extension == null? PrinterUtil.getExt(templateName):extension).toString();
     }
 }

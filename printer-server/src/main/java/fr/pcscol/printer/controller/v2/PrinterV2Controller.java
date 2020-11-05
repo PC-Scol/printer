@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.v2.PrinterApi;
+import fr.pcscol.printer.api.v2.model.FreemarkerPrintMessage;
 import fr.pcscol.printer.api.v2.model.JasperPrintMessage;
 import fr.pcscol.printer.api.v2.model.XdocPrintMessage;
 import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
+import fr.pcscol.printer.service.freemarker.FreemarkerPrinterService;
 import fr.pcscol.printer.service.jasper.JasperExportType;
 import fr.pcscol.printer.service.jasper.JasperPrinterService;
 import fr.pcscol.printer.service.xdoc.XdocFieldMetadata;
@@ -46,6 +48,9 @@ public class PrinterV2Controller implements PrinterApi {
 
     @Autowired
     private JasperPrinterService jasperPrinterService;
+
+    @Autowired
+    private FreemarkerPrinterService freemarkerPrinterService;
 
     @Value("${printer.template.base-url}")
     private String templateBaseUrl;
@@ -102,7 +107,7 @@ public class PrinterV2Controller implements PrinterApi {
                 //success response
                 byte[] content = outputStream.toByteArray();
                 //extract output file name
-                String fileName = new StringBuilder(templateName).append(PrinterUtil.UNDERSCORE).append(System.currentTimeMillis()).append(PrinterUtil.DOT).append(exportType.toString().toLowerCase()).toString();
+                String fileName = PrinterUtil.extractOutputFileNameByExt(templateName, String.valueOf(System.currentTimeMillis()), exportType.toString().toLowerCase());
                 //return response
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))
@@ -179,4 +184,45 @@ public class PrinterV2Controller implements PrinterApi {
         }
     }
 
+    @Override
+    public ResponseEntity<byte[]> freemarkerPrint(@NotNull FreemarkerPrintMessage body) {
+
+        String templateName = body.getTemplateName();
+        if (StringUtils.isBlank(templateName)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Template name must be provided.");
+        }
+
+        //data to print
+        Map<String, Object> data = (Map<String, Object>) body.getData();
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            try {
+                //invoke generation
+                freemarkerPrinterService.generate(templateName, data, outputStream);
+                //success response
+                byte[] content = outputStream.toByteArray();
+                //extract output file name
+                String fileName = PrinterUtil.extractOutputFileNameByExt(templateName, String.valueOf(System.currentTimeMillis()), null);
+                //return response
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))
+                        // Content-Type
+                        .contentType(MediaType.valueOf(PrinterUtil.getMimeType(templateName)))
+                        .contentLength(content.length)
+                        .body(content);
+            } catch (TemplateNotFoundException e) {
+                //template not found or not applicable
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, e.getMessage(), e);
+            } catch (DocumentGenerationException e) {
+                //error occured during generation
+                throw new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        }
+    }
 }

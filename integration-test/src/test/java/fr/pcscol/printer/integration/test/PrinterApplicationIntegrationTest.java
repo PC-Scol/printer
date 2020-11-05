@@ -3,6 +3,7 @@ package fr.pcscol.printer.integration.test;
 import fr.pcscol.printer.adapter.PrinterException;
 import fr.pcscol.printer.client.api.PrinterApi;
 import fr.pcscol.printer.client.api.model.PrintMessage;
+import fr.pcscol.printer.client.v2.api.model.FreemarkerPrintMessage;
 import fr.pcscol.printer.client.v2.api.model.JasperExporterConfigParams;
 import fr.pcscol.printer.client.v2.api.model.JasperPrintMessage;
 import fr.pcscol.printer.client.v2.api.model.XdocPrintMessage;
@@ -119,6 +120,26 @@ public class PrinterApplicationIntegrationTest {
         XdocPrintMessage printMessage = new XdocPrintMessage().templateUrl("certificat.odt").data(personBean).convert(true);
         printerApiV2.getApiClient().setBasePath("http://localhost:8080/printer/v2");
         byte[] content = printerApiV2.xdocPrint(printMessage);
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
+            outputStream.write(content);
+        }
+        Assert.assertThat(content.length, Matchers.greaterThan(0));
+
+    }
+
+    @Test
+    public void freemarkerPrintV2_OKTest() throws IOException {
+
+        File outFile = File.createTempFile("PrinterV2ApplicationIntegrationTest_out_", ".csv", new File("build"));
+        if (!keepFilesEnv) {
+          //  outFile.deleteOnExit();
+        }
+
+        //build PrintMessage
+        PersonBean personBean = new PersonBean("Jean", "Dupont");
+        FreemarkerPrintMessage printMessage = new FreemarkerPrintMessage().templateName("certificat.csv").data(personBean);
+        printerApiV2.getApiClient().setBasePath("http://localhost:8080/printer/v2");
+        byte[] content = printerApiV2.freemarkerPrint(printMessage);
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
             outputStream.write(content);
         }
