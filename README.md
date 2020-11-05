@@ -1,15 +1,17 @@
 # printer
 
 A Spring-Boot micro-service for generating documents (odt, docx, doc, pdf).
-The service provides two end-points :
+The service provides 3 end-points :
+- '/print/freemarker' which provides generation based on [FreeMarker](https://freemarker.apache.org/) .
 - '/print/xdoc' which provides generation based on [XDocReport](https://github.com/opensagres/xdocreport/wiki) .
 - '/print/jasper' which provides generation based on [JasperReports Library](https://community.jaspersoft.com/project/jasperreports-library) .
 
 Depending on the selected implementation, you need to provide a compatible template file :
+- FreeMarker : any plain text file (txt, csv) with Freemarker placeholders.
 - XDocReport : odt, docx, doc document with Freemarker placeholders.
 - JasperReport : zip archive containing JRXML files (for main report and subreports).
 
-And a data model. Then the merge process will produce a document (odt, docx, doc, pdf) containing the data.
+And a data model. Then the merge process will produce a document (odt, docx, doc, pdf, txt, csv) containing the data.
 
 ![Generation process!](assets/process_generation.png "Generation process") 
 
@@ -26,6 +28,8 @@ docker pull pcscol/printer-server
 printer:
   template:
     base-url: file:///app/resources/templates/xdoc
+  freemarker:
+    base-path: /app/resources/templates/freemarker
   jasper:
     base-url: file:///app/resources/templates/jasper
     unzip-folder: /tmp
@@ -37,6 +41,7 @@ printer:
 ```
 
 - printer.template.base-url : base url for xdoc templates
+- printer.freemarker.base-path : base path for freemarker templates
 - printer.jasper: 
     - base-url : base url for jasper templates
     - unzip-folder : temp folder for unzipping jasper archives
@@ -59,6 +64,8 @@ DATA_FOLDER :
         └── certificat.odt
     └── jasper
         └── certificat.zip
+    └── freemarker
+        └── certificat.csv
 ```
 
 
@@ -74,6 +81,19 @@ The printer-server exposes a swagger UI for testing accessible at: [http://local
 You can use it to try the WS :
 
 1. Provide a body
+
+- A **FreemarkerPrintMessage** if you use the **"/print/freemarker"** end-point :
+```
+{
+
+  // 1 : The name of the template under the 'printer.freemarker.base-path' folder
+  "templateName": "certificat.csv"   
+
+  // 2 : The data to merge within the document  
+  "data": {"firstName" : "John", "lastName" : "Doe"},
+
+}
+```
 
 - A **XdocPrintMessage** if you use the **"/print/xdoc"** end-point :
 ```
@@ -153,7 +173,7 @@ You can find here some documentation about it :
 - [Dynamic image rendering](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainDynamicImage)
 - List rendering : [here](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainListFieldInTable) and [here](https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainListFieldAdvancedTable)
 
-### Input template formatting (XDocReport only)
+### Input template formatting (For FreeMarker and XDocReport)
 
 The Printer Service expects input templates using the [FreeMarker](https://freemarker.apache.org/) syntax.
 
