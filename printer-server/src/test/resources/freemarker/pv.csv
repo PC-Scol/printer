@@ -1,0 +1,23 @@
+${titre}
+${periode}
+
+<#-- affichage groupements -->
+,,,,<#list objetFormationDescs as objetFormDesc>${objetFormDesc.groupement},,,,</#list>
+<#-- affichage formation + objetFormations -->
+,,,${(libelleFormation)!"-"},<#list objetFormationDescs as objetFormDesc>${objetFormDesc.libelle},,,,</#list>
+<#-- affichage noms colonnes -->
+N° étudiant,Nom,Prenom,note,<#list objetFormationDescs as objetForm>barème,crédit,résultat,note,</#list>
+<#list apprenants as apprenant>
+<#-- affichage liste étudiants -->
+${apprenant.numero},${apprenant.nom},${apprenant.prenom},${(apprenant.noteFormation)!"-"},<#t>
+<#list apprenant.objetFormations as objetForm>
+<#-- affichage données étudiant -->
+<#if objetForm??>
+${objetForm.bareme},${objetForm.credit},${(objetForm.resultat)!"-"},${objetForm.note},<#t>
+<#else>
+-,-,-,-,<#t>
+</#if>
+</#list>
+
+<#-- ligne vide volontaire -->
+</#list>

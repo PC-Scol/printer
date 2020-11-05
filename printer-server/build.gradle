@@ -25,10 +25,14 @@ dependencies {
 
     implementation project(':printer-api')
 
-    //xdocreport
+    //xdocreport & freemarker
     implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xDocReportVersion}")
     implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xDocReportVersion}")
-    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}")
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}") {
+        exclude group: "org.freemarker", module: "freemarker"
+    }
+
+    implementation("org.freemarker:freemarker:${freemarkerVersion}")
 
     //jasperreport
     implementation("net.sf.jasperreports:jasperreports:${jasperReportsVersion}")

@@ -1,6 +1,8 @@
 printer:
   template:
     base-url: classpath:/
+  freemarker:
+    base-path: ./src/test/resources/freemarker
   jasper:
     base-url: classpath:/jasper
     unzip-folder: build/generated
