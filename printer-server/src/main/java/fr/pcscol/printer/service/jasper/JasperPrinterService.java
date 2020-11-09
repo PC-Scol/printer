@@ -141,7 +141,9 @@ public class JasperPrinterService {
         try {
             return reportCache.get(templateUrl.getPath(), () -> loaderService.load(templateUrl));
         } catch (ExecutionException | UncheckedExecutionException e) {
-            throw new TemplateNotFoundException("Unable to get template.", e.getCause());
+            String err = String.format("Unable to load template @ %s.", templateUrl.getPath());
+            logger.error(err, e.getCause());
+            throw new TemplateNotFoundException(err, e.getCause());
         }
     }
 
