@@ -203,7 +203,7 @@ public class PrinterV2Controller implements PrinterApi {
                 //success response
                 byte[] content = outputStream.toByteArray();
                 //extract output file name
-                String fileName = PrinterUtil.buildFileName(templateName, String.valueOf(System.currentTimeMillis()), PrinterUtil.getExt(templateName));
+                String fileName = PrinterUtil.buildFileName(PrinterUtil.extractFileName(templateName), String.valueOf(System.currentTimeMillis()), PrinterUtil.getExt(templateName));
                 //return response
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))
