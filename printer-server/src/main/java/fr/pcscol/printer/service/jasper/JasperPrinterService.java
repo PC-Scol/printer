@@ -21,12 +21,12 @@ import net.sf.jasperreports.export.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -36,25 +36,23 @@ public class JasperPrinterService {
 
     private Logger logger = LoggerFactory.getLogger(JasperPrinterService.class);
 
+    @Value("${printer.jasper.base-url}")
+    private String templateBaseUrl;
+
     @Autowired
     private JasperLoaderService loaderService;
 
     private Cache<String, JasperPrintReport> reportCache = CacheBuilder.newBuilder().build();
 
-    @PostConstruct
-    public void init() throws IOException {
-        loaderService.load();
-    }
+    public void generate(URL templateUrl, JsonNode data, Map<String, Object> parameters, JasperExportType exportType, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {
 
-    public void generate(String reportName, JsonNode data, Map<String, Object> parameters, JasperExportType exportType, OutputStream outputStream) throws TemplateNotFoundException, DocumentGenerationException {
-
-        logger.debug("New document generation is requested with template={}, data={}, exportType={}", reportName, data, exportType);
+        logger.debug("New document generation is requested with templateUrl={}, data={}, exportType={}", templateUrl, data, exportType);
 
         //create dataSource
         try (InputStream jsonStream = IOUtils.toInputStream(data.toString())) {
             JsonDataSource dataSource = new JsonDataSource(jsonStream, ".");
             //retrieve report
-            JasperPrintReport templateReport = getTemplateReport(reportName);
+            JasperPrintReport templateReport = getTemplateReport(templateUrl);
             //print
             Map<String, Object> reportParams = new HashMap<>();
             if (parameters != null && !parameters.isEmpty()) {
@@ -67,7 +65,7 @@ public class JasperPrinterService {
             logger.debug("Exporting {} document.", exportType);
             JRAbstractExporter exporter = this.configureExporter(exportType, parameters, jasperPrint, outputStream);
             exporter.exportReport();
-            logger.debug("New document generated with template {}", reportName);
+            logger.debug("New document generated with template {}", templateUrl);
 
         } catch (TemplateNotFoundException e) {
             throw e;
@@ -139,13 +137,16 @@ public class JasperPrinterService {
         return exporter;
     }
 
-    private JasperPrintReport getTemplateReport(String name) {
+    private JasperPrintReport getTemplateReport(URL templateUrl) {
         try {
-            return reportCache.get(name, () -> loaderService.get(name));
+            return reportCache.get(templateUrl.getPath(), () -> loaderService.load(templateUrl));
         } catch (ExecutionException | UncheckedExecutionException e) {
             throw new TemplateNotFoundException("Unable to get template.", e.getCause());
         }
     }
 
 
+    public String getTemplateBaseUrl() {
+        return templateBaseUrl;
+    }
 }

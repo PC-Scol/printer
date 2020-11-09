@@ -14,16 +14,14 @@ public class JasperPrintReport {
     private String name;
     private String url;
     private Path folder;
-    private JasperReport main;
     private ReportContext context;
     private JasperReportSource source;
 
-    public JasperPrintReport(String name, String url, String folder, String resourceFolder, JasperReport main, ReportContext context) {
-        this.name = name;
+    public JasperPrintReport(String url, String folder, String resourceFolder, JasperReport main, ReportContext context) {
         this.url = url;
         this.folder = Path.of(folder);
+        this.name = this.folder.getName(this.folder.getNameCount() -1).toString();
         this.resourceFolder = resourceFolder;
-        this.main = main;
         this.context = context;
 
         SimpleRepositoryResourceContext fallBackContext = SimpleRepositoryResourceContext.of(resourceFolder);
@@ -43,10 +41,6 @@ public class JasperPrintReport {
 
     public Path getFolder() {
         return folder;
-    }
-
-    public JasperReport getMain() {
-        return main;
     }
 
     public ReportContext getContext() {

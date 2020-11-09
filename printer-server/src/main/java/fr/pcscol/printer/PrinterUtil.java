@@ -34,6 +34,8 @@ public final class PrinterUtil {
         mimeMap.put("txt", "text/plain");
     }
 
+    public static final String PDF = "pdf";
+
     public static final String SLASH = "/";
     public static final String EMPTY = "";
     public static final String QUOTE = "\"";
@@ -41,6 +43,10 @@ public final class PrinterUtil {
     public static final String UNDERSCORE = "_";
 
     public static final URL completeUrl(final String templateUrl, final String templateBaseUrl) throws MalformedURLException {
+
+        if(org.apache.commons.lang3.StringUtils.isBlank(templateUrl)){
+            throw new MalformedURLException(String.format("Provided URL format is not correct : %s", templateUrl));
+        }
         URI uri;
         try {
             uri = new URI(templateUrl);
@@ -81,40 +87,43 @@ public final class PrinterUtil {
         return mimeMap.get(ext);
     }
 
-    public static String extractOutputFileName(String originalPath, String suffix, boolean convert) {
+    public static String extractFileName(String path){
         String fileName;
-        String ext;
-        int slashIndex = originalPath.lastIndexOf(SLASH);
-        int dotIndex = originalPath.lastIndexOf(DOT);
+        int slashIndex = path.lastIndexOf(SLASH);
+        int dotIndex = path.lastIndexOf(DOT);
 
         if (dotIndex == -1) {
             throw new IllegalArgumentException("Cannot retrieve file extension");
         }
-        ext = originalPath.substring(dotIndex + 1);
         if (slashIndex == -1) {
-            fileName = originalPath.substring(0, dotIndex);
+            fileName = path.substring(0, dotIndex);
         } else {
-            fileName = originalPath.substring(slashIndex + 1, dotIndex);
+            fileName = path.substring(slashIndex + 1, dotIndex);
         }
+        return fileName;
+    }
+
+    public static String buildFileName(String fileName, String suffix, String ext) {
 
         StringBuilder sb = new StringBuilder().append(fileName);
         if (!StringUtils.isEmpty(suffix)) {
             sb.append(UNDERSCORE).append(suffix);
         }
-        return sb.append(DOT).append(convert == true ? "pdf" : ext).toString();
+        return sb.append(DOT).append(ext).toString();
     }
 
-    public static void unzipTemplate(URL templateUrl, Path destination) throws IOException {
+    public static Path unzipTemplate(URL templateUrl, Path destination) throws IOException {
 
         try (InputStream inputStream = templateUrl.openStream();
              ZipInputStream zis = new ZipInputStream(inputStream)) {
 
             File parent = new File(destination.toUri());
-            if(!parent.exists()){
+            if (!parent.exists()) {
                 parent.mkdirs();
             }
 
             ZipEntry zipEntry = zis.getNextEntry();
+            Path resultFolder = Path.of(destination.toString(), zipEntry.getName());
             byte[] buffer = new byte[1024];
             while (zipEntry != null) {
 
@@ -137,16 +146,8 @@ public final class PrinterUtil {
                 logger.debug("Unzipped file : {}", newFile.getAbsoluteFile());
             }
             zis.closeEntry();
-        } catch (IOException e) {
-            String err = String.format("Unable to load template file @ %s.", templateUrl);
-            throw e;
+            return resultFolder;
         }
     }
 
-    public static String extractOutputFileNameByExt(String templateName, String suffix, String extension) {
-
-        return new StringBuilder(templateName.contains(PrinterUtil.DOT) ? templateName.substring(templateName.lastIndexOf(PrinterUtil.DOT) + 1) : templateName)
-                .append(PrinterUtil.UNDERSCORE).append(suffix).append(PrinterUtil.DOT)
-                .append(extension == null? PrinterUtil.getExt(templateName):extension).toString();
-    }
 }

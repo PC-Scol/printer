@@ -8,7 +8,7 @@ import net.sf.jasperreports.engine.util.JRVisitorSupport;
 import net.sf.jasperreports.repo.JasperDesignCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -23,32 +23,22 @@ public class JasperLoaderService {
 
     private Logger logger = LoggerFactory.getLogger(JasperLoaderService.class);
 
-    @Autowired
-    private JasperConfiguration configuration;
+    private static final String UNZIP_FOLDER = "/tmp";
+    private static final String MAIN_JRXML = "main.jrxml";
 
-    public void load() throws IOException {
-        for (JasperTemplateDef def : configuration.getTemplates()) {
-            Path folder = Path.of(configuration.getUnzipFolder());
-            URL templateUrl = PrinterUtil.completeUrl(def.getUrl(), configuration.getBaseUrl());
-            PrinterUtil.unzipTemplate(templateUrl, folder);
-        }
+    @Value("${printer.jasper.resource-folder}")
+    private String sharedResourcesFolder;
+
+    public JasperPrintReport load(URL templateUrl) throws IOException {
+        Path templateFolder = PrinterUtil.unzipTemplate(templateUrl, Path.of(UNZIP_FOLDER));
+        return loadJasperDefinition(templateUrl, templateFolder.toString());
     }
 
-    public JasperPrintReport get(String name) {
-        for (JasperTemplateDef def : configuration.getTemplates()) {
-            if (def.getName().equals(name)) {
-                Path folder = Path.of(configuration.getUnzipFolder(), def.getName());
-                return loadJasperDefinition(def, folder.toString());
-            }
-        }
-        throw new TemplateNotFoundException(String.format("Template with name %s is not defined.", name));
-    }
-
-    private JasperPrintReport loadJasperDefinition(JasperTemplateDef def, String folder) {
+    private JasperPrintReport loadJasperDefinition(URL templateUrl, String folder) {
 
         ReportContext reportContext = new SimpleReportContext();
-        JasperReport report = loadFromJrxml(Path.of(folder.toString(), def.getMain()), reportContext);
-        return new JasperPrintReport(def.getName(), def.getUrl(), folder, configuration.getResourceFolder(), report, reportContext);
+        JasperReport report = loadFromJrxml(Path.of(folder, MAIN_JRXML), reportContext);
+        return new JasperPrintReport(templateUrl.getPath(), folder, sharedResourcesFolder, report, reportContext);
     }
 
     private JasperReport loadFromJrxml(Path jrxmlFilePath, ReportContext reportContext) throws TemplateNotFoundException {

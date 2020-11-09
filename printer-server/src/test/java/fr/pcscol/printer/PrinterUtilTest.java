@@ -77,19 +77,4 @@ public class PrinterUtilTest {
         Assert.assertNull(PrinterUtil.getMimeType("test.xxx"));
     }
 
-    @Test
-    public void extractOutputFileNameTest() {
-        Assert.assertEquals("test_0000.txt", PrinterUtil.extractOutputFileName("test.txt", "0000", false));
-        Assert.assertEquals("test_0000.pdf", PrinterUtil.extractOutputFileName("test.txt", "0000", true));
-        Assert.assertEquals("test_0000.txt", PrinterUtil.extractOutputFileName("file://path/to/test.txt", "0000", false));
-        Assert.assertEquals("test_0000.pdf", PrinterUtil.extractOutputFileName("file://path/to/test.txt", "0000", true));
-        Assert.assertEquals("test_0000.pdf", PrinterUtil.extractOutputFileName("/test.txt", "0000", true));
-
-        try {
-            PrinterUtil.extractOutputFileName("/test", null, true);
-            Assert.fail();
-        } catch (IllegalArgumentException e) {
-            //success
-        }
-    }
 }

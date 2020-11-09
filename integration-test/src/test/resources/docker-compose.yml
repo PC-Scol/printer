@@ -6,6 +6,11 @@ services:
     - "8080:8080"
     hostname: printer-server
     user: root
+    environment:
+      printer.xdoc.base-url: file:///app/resources/templates/xdoc
+      printer.freemarker.base-path: /app/resources/templates/freemarker
+      printer.jasper.base-url: file:///app/resources/templates/jasper
+      printer.jasper.resource-folder: /app/resources/templates/jasper
     volumes:
     - type: bind
       source: @project.projectDir@/src/test/resources/

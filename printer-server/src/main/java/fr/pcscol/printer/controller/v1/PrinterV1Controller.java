@@ -38,9 +38,6 @@ public class PrinterV1Controller implements PrinterApi {
     @Autowired
     private XdocPrinterService printerService;
 
-    @Value("${printer.template.base-url}")
-    private String templateBaseUrl;
-
     public static final Function<FieldMetadata, XdocFieldMetadata> toXdocFieldMetadata = f -> {
         XdocFieldMetadata result;
         if (f instanceof ImageFieldMetadata) {
@@ -59,7 +56,7 @@ public class PrinterV1Controller implements PrinterApi {
         //check template url is valid and complete it if not absolute
         URL templateUrl;
         try {
-            templateUrl = PrinterUtil.completeUrl(body.getTemplateUrl(), templateBaseUrl);
+            templateUrl = PrinterUtil.completeUrl(body.getTemplateUrl(), printerService.getTemplateBaseUrl());
         } catch (MalformedURLException e) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, e.getMessage(), e);
@@ -70,8 +67,8 @@ public class PrinterV1Controller implements PrinterApi {
 
         //metadata about fields
         List<XdocFieldMetadata> fieldMetadataList = null;
-        if(body.getFieldsMetadata() != null) {
-           fieldMetadataList = Optional.ofNullable(body.getFieldsMetadata()).orElse(Collections.emptyList()).stream().map(toXdocFieldMetadata).collect(Collectors.toList());
+        if (body.getFieldsMetadata() != null) {
+            fieldMetadataList = Optional.ofNullable(body.getFieldsMetadata()).orElse(Collections.emptyList()).stream().map(toXdocFieldMetadata).collect(Collectors.toList());
         }
 
         //is pdf conversion requested
@@ -84,7 +81,7 @@ public class PrinterV1Controller implements PrinterApi {
                 //success response
                 byte[] content = outputStream.toByteArray();
                 //extract output file name
-                String fileName = PrinterUtil.extractOutputFileName(templateUrl.getPath(), String.valueOf(System.currentTimeMillis()), convert);
+                String fileName = PrinterUtil.buildFileName(PrinterUtil.extractFileName(templateUrl.getPath()), String.valueOf(System.currentTimeMillis()), convert ? PrinterUtil.PDF : PrinterUtil.getExt(templateUrl.getPath()));
                 //return response
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))

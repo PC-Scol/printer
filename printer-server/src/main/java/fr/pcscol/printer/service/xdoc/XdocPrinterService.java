@@ -14,6 +14,7 @@ import fr.pcscol.printer.service.exception.DocumentGenerationException;
 import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -31,6 +32,10 @@ import java.util.Map;
 public class XdocPrinterService {
 
     private Logger logger = LoggerFactory.getLogger(XdocPrinterService.class);
+
+    @Value("${printer.xdoc.base-url}")
+    private String templateBaseUrl;
+
 
     /**
      * report/template registry used to load and cache reports
@@ -165,4 +170,7 @@ public class XdocPrinterService {
         }
     }
 
+    public String getTemplateBaseUrl() {
+        return this.templateBaseUrl;
+    }
 }

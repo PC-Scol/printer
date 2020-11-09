@@ -1,13 +1,11 @@
 printer:
-  template:
-    base-url: classpath:/
+  xdoc:
+    base-url: classpath:/xdoc
   freemarker:
     base-path: /freemarker
   jasper:
     base-url: classpath:/jasper
-    unzip-folder: ./build/generated
     resource-folder: /jasper
-    templates:
 
 #actuator
 #management.server.port=9090

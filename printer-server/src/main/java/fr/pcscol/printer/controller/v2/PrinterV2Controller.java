@@ -52,9 +52,6 @@ public class PrinterV2Controller implements PrinterApi {
     @Autowired
     private FreemarkerPrinterService freemarkerPrinterService;
 
-    @Value("${printer.template.base-url}")
-    private String templateBaseUrl;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -73,10 +70,13 @@ public class PrinterV2Controller implements PrinterApi {
     @Override
     public ResponseEntity<byte[]> jasperPrint(@NotNull JasperPrintMessage body) {
 
-        String templateName = body.getTemplateName();
-        if (StringUtils.isBlank(templateName)) {
+        //check template url is valid and complete it if not absolute
+        URL templateUrl;
+        try {
+            templateUrl = PrinterUtil.completeUrl(body.getTemplateUrl(), jasperPrinterService.getTemplateBaseUrl());
+        } catch (MalformedURLException e) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Template name must be provided.");
+                    HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
 
         //data to print
@@ -103,11 +103,11 @@ public class PrinterV2Controller implements PrinterApi {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             try {
                 //invoke generation
-                jasperPrinterService.generate(templateName, data, parameters, exportType, outputStream);
+                jasperPrinterService.generate(templateUrl, data, parameters, exportType, outputStream);
                 //success response
                 byte[] content = outputStream.toByteArray();
                 //extract output file name
-                String fileName = PrinterUtil.extractOutputFileNameByExt(templateName, String.valueOf(System.currentTimeMillis()), exportType.toString().toLowerCase());
+                String fileName = PrinterUtil.buildFileName(PrinterUtil.extractFileName(templateUrl.getPath()), String.valueOf(System.currentTimeMillis()), exportType.toString().toLowerCase());
                 //return response
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))
@@ -136,7 +136,7 @@ public class PrinterV2Controller implements PrinterApi {
         //check template url is valid and complete it if not absolute
         URL templateUrl;
         try {
-            templateUrl = PrinterUtil.completeUrl(body.getTemplateUrl(), templateBaseUrl);
+            templateUrl = PrinterUtil.completeUrl(body.getTemplateUrl(), xdocPrinterService.getTemplateBaseUrl());
         } catch (MalformedURLException e) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, e.getMessage(), e);
@@ -161,7 +161,7 @@ public class PrinterV2Controller implements PrinterApi {
                 //success response
                 byte[] content = outputStream.toByteArray();
                 //extract output file name
-                String fileName = PrinterUtil.extractOutputFileName(templateUrl.getPath(), String.valueOf(System.currentTimeMillis()), convert);
+                String fileName = PrinterUtil.buildFileName(PrinterUtil.extractFileName(templateUrl.getPath()), String.valueOf(System.currentTimeMillis()), convert? PrinterUtil.PDF : PrinterUtil.getExt(templateUrl.getPath()));
                 //return response
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))
@@ -203,7 +203,7 @@ public class PrinterV2Controller implements PrinterApi {
                 //success response
                 byte[] content = outputStream.toByteArray();
                 //extract output file name
-                String fileName = PrinterUtil.extractOutputFileNameByExt(templateName, String.valueOf(System.currentTimeMillis()), null);
+                String fileName = PrinterUtil.buildFileName(templateName, String.valueOf(System.currentTimeMillis()), PrinterUtil.getExt(templateName));
                 //return response
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", fileName))

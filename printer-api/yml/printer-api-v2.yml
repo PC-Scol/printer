@@ -240,10 +240,10 @@ components:
     JasperPrintMessage:
       type: object
       required:
-      - templateName
+      - templateUrl
       - data
       properties:
-        templateName:
+        templateUrl:
           type: string
           description: Name of the template used for the generation (name of the provided zip file).
         exportType:

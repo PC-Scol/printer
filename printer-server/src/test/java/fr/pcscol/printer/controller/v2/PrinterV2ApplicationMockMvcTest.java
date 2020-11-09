@@ -17,6 +17,7 @@ import fr.pcscol.printer.service.xdoc.XdocPrinterService;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.stubbing.Answer;
@@ -33,8 +34,7 @@ import java.io.*;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -62,14 +62,24 @@ public class PrinterV2ApplicationMockMvcTest {
     @MockBean
     private FreemarkerPrinterService freemarkerPrinterService;
 
-    @Value("${printer.template.base-url}")
-    private String templateBaseUrl;
+    @Value("${printer.xdoc.base-url}")
+    private String xdocTemplateBaseUrl;
+
+    @Value("${printer.jasper.base-url}")
+    private String jasperTemplateBaseUrl;
 
     private static final Boolean keepFilesEnv = Boolean.valueOf(System.getenv("keepFiles"));
 
     static {
         TomcatURLStreamHandlerFactory.getInstance();
     }
+
+    @Before
+    public void init(){
+        when(xdocPrinterService.getTemplateBaseUrl()).thenReturn(xdocTemplateBaseUrl);
+        when(jasperPrinterService.getTemplateBaseUrl()).thenReturn(jasperTemplateBaseUrl);
+    }
+
 
     @Test
     public void xdocPrint_OkTest() throws Exception {
@@ -95,7 +105,7 @@ public class PrinterV2ApplicationMockMvcTest {
                         outputStream.write(generatedBytes);
                         return null;
                     }
-            ).when(xdocPrinterService).generate(eq(PrinterUtil.completeUrl("xdoc/certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
+            ).when(xdocPrinterService).generate(eq(PrinterUtil.completeUrl("xdoc/certificat.odt", xdocTemplateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
 
             //invoke WS
             XdocPrintMessage printMessage = new XdocPrintMessage().templateUrl("xdoc/certificat.odt").data(personBean).convert(true);
@@ -136,7 +146,7 @@ public class PrinterV2ApplicationMockMvcTest {
 
         //mock printService call
         doThrow(new TemplateNotFoundException("Template not found")).when(xdocPrinterService).generate(
-                eq(PrinterUtil.completeUrl("unknown.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
+                eq(PrinterUtil.completeUrl("unknown.odt", xdocTemplateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
 
         //invoke WS
         XdocPrintMessage printMessage = new XdocPrintMessage().templateUrl("unknown.odt").data(personBean).convert(true);
@@ -155,7 +165,7 @@ public class PrinterV2ApplicationMockMvcTest {
 
         //mock printService call
         doThrow(new DocumentGenerationException("An error occured during document generation")).when(xdocPrinterService).generate(
-                eq(PrinterUtil.completeUrl("xdoc/certificat.odt", templateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
+                eq(PrinterUtil.completeUrl("xdoc/certificat.odt", xdocTemplateBaseUrl)), eq(map), isNull(), eq(true), any(OutputStream.class));
 
         //invoke WS
         XdocPrintMessage printMessage = new XdocPrintMessage().templateUrl("xdoc/certificat.odt").data(personBean).convert(true);
@@ -189,10 +199,10 @@ public class PrinterV2ApplicationMockMvcTest {
                         outputStream.write(generatedBytes);
                         return null;
                     }
-            ).when(jasperPrinterService).generate(eq("certificat"), eq(data), isNull(), eq(JasperExportType.PDF), any(OutputStream.class));
+            ).when(jasperPrinterService).generate(eq(PrinterUtil.completeUrl("certificat.zip", jasperTemplateBaseUrl)), eq(data), isNull(), eq(JasperExportType.PDF), any(OutputStream.class));
 
             //invoke WS
-            JasperPrintMessage printMessage = new JasperPrintMessage().templateName("certificat").data(personBean).exportType(JasperPrintMessage.ExportTypeEnum.PDF);
+            JasperPrintMessage printMessage = new JasperPrintMessage().templateUrl("certificat.zip").data(personBean).exportType(JasperPrintMessage.ExportTypeEnum.PDF);
             String body = objectMapper.writeValueAsString(printMessage);
             mvc.perform(post("/printer/v2/print/jasper").contentType(MediaType.APPLICATION_JSON).content(body))
                     .andExpect(status().isOk())
@@ -212,11 +222,11 @@ public class PrinterV2ApplicationMockMvcTest {
         PersonBean personBean = new PersonBean("Jean", "Dupont");
 
         //invoke WS
-        JasperPrintMessage printMessage = new JasperPrintMessage().templateName("").data(personBean);
+        JasperPrintMessage printMessage = new JasperPrintMessage().templateUrl("").data(personBean);
         String body = objectMapper.writeValueAsString(printMessage);
         mvc.perform(post("/printer/v2/print/jasper").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Template name must be provided."));
+                .andExpect(status().reason("Provided URL format is not correct : "));
 
     }
 
@@ -229,10 +239,10 @@ public class PrinterV2ApplicationMockMvcTest {
 
         //mock printService call
         doThrow(new TemplateNotFoundException("Template not found")).when(jasperPrinterService).generate(
-                eq("unknown.odt"), eq(data), isNull(), eq(JasperExportType.PDF), any(OutputStream.class));
+                eq(PrinterUtil.completeUrl("unknown.odt", jasperTemplateBaseUrl)), eq(data), isNull(), eq(JasperExportType.PDF), any(OutputStream.class));
 
         //invoke WS
-        JasperPrintMessage printMessage = new JasperPrintMessage().templateName("unknown.odt").data(personBean);
+        JasperPrintMessage printMessage = new JasperPrintMessage().templateUrl("unknown.odt").data(personBean);
         String body = objectMapper.writeValueAsString(printMessage);
         mvc.perform(post("/printer/v2/print/jasper").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isNotFound())
@@ -248,10 +258,10 @@ public class PrinterV2ApplicationMockMvcTest {
 
         //mock printService call
         doThrow(new DocumentGenerationException("An error occured during document generation")).when(jasperPrinterService).generate(
-                eq("certificat"), eq(data), isNull(), eq(JasperExportType.ODT), any(OutputStream.class));
+                eq(PrinterUtil.completeUrl("certificat.zip", jasperTemplateBaseUrl)), eq(data), isNull(), eq(JasperExportType.ODT), any(OutputStream.class));
 
         //invoke WS
-        JasperPrintMessage printMessage = new JasperPrintMessage().templateName("certificat").data(personBean).exportType(JasperPrintMessage.ExportTypeEnum.ODT);
+        JasperPrintMessage printMessage = new JasperPrintMessage().templateUrl("certificat.zip").data(personBean).exportType(JasperPrintMessage.ExportTypeEnum.ODT);
         String body = objectMapper.writeValueAsString(printMessage);
         mvc.perform(post("/printer/v2/print/jasper").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isInternalServerError())

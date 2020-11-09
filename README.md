@@ -9,7 +9,7 @@ The service provides 3 end-points :
 Depending on the selected implementation, you need to provide a compatible template file :
 - FreeMarker : any plain text file (txt, csv) with Freemarker placeholders.
 - XDocReport : odt, docx, doc document with Freemarker placeholders.
-- JasperReport : zip archive containing JRXML files (for main report and subreports).
+- JasperReport : zip archive containing JRXML files **(the main report entry-point MUST be named main.jrxml)**.
 
 And a data model. Then the merge process will produce a document (odt, docx, doc, pdf, txt, csv) containing the data.
 
@@ -32,24 +32,14 @@ printer:
     base-path: /app/resources/templates/freemarker
   jasper:
     base-url: file:///app/resources/templates/jasper
-    unzip-folder: /tmp
     resource-folder: /app/resources/templates/jasper
-    templates:
-      - name: certificat
-        main: Certificat.jrxml
-        url: certificat.zip  
 ```
 
 - printer.template.base-url : base url for xdoc templates
 - printer.freemarker.base-path : base path for freemarker templates
 - printer.jasper: 
     - base-url : base url for jasper templates
-    - unzip-folder : temp folder for unzipping jasper archives
     - resource-folder : folder for shared resources (which may be used in templates)
-    - templates : list of managed jasper templates
-        - url : the url to the template zip archive (may be relative to printer.jasper.base-url)
-        - name : the name of the template (which is also the name of the unzipped folder)
-        - main : the main report jrxml file
 
 ### Configure a volume :
 
@@ -120,7 +110,7 @@ You can use it to try the WS :
   "exportType": "PDF",
 
   // 2 : The name of the template (which is also the name of the unzipped folder).  
-  "templateName": "certificat"   
+  "templateUrl": "certificat.zip"   
 
   // 3 : The data to merge within the document  
   "data": {"firstName" : "John", "lastName" : "Doe"},

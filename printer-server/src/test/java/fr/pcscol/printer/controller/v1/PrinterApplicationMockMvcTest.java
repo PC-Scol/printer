@@ -10,6 +10,7 @@ import fr.pcscol.printer.service.exception.TemplateNotFoundException;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.stubbing.Answer;
@@ -26,8 +27,7 @@ import java.io.*;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,7 +49,7 @@ public class PrinterApplicationMockMvcTest {
     @MockBean
     private XdocPrinterService printerService;
 
-    @Value("${printer.template.base-url}")
+    @Value("${printer.xdoc.base-url}")
     private String templateBaseUrl;
 
     private static final Boolean keepFilesEnv = Boolean.valueOf(System.getenv("keepFiles"));
@@ -58,6 +58,10 @@ public class PrinterApplicationMockMvcTest {
         TomcatURLStreamHandlerFactory.getInstance();
     }
 
+    @Before
+    public void init(){
+        when(printerService.getTemplateBaseUrl()).thenReturn(templateBaseUrl);
+    }
 
     @Test
     public void print_OkTest() throws Exception {

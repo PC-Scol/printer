@@ -89,7 +89,7 @@ public class PrinterApplicationIntegrationTest {
 
         File outFile = File.createTempFile("PrinterV2ApplicationIntegrationTest_out_", ".pdf", new File("build"));
         if (!keepFilesEnv) {
-           //outFile.deleteOnExit();
+            outFile.deleteOnExit();
         }
 
         //build PrintMessage
@@ -97,7 +97,7 @@ public class PrinterApplicationIntegrationTest {
         Map<String, Object> params = Map.of(
                 JasperExporterConfigParams.PDF_EXPORT_DISPLAYMETADATATITLE.getValue(), true,
                 JasperExporterConfigParams.ALL_EXPORT_METADATATITLE.getValue(), "Mon Certificat");
-        JasperPrintMessage printMessage = new JasperPrintMessage().templateName("certificat").data(personBean).parameters(params);
+        JasperPrintMessage printMessage = new JasperPrintMessage().templateUrl("certificat.zip").data(personBean).parameters(params);
         printerApiV2.getApiClient().setBasePath("http://localhost:8080/printer/v2");
         byte[] content = printerApiV2.jasperPrint(printMessage);
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outFile))) {
@@ -132,7 +132,7 @@ public class PrinterApplicationIntegrationTest {
 
         File outFile = File.createTempFile("PrinterV2ApplicationIntegrationTest_out_", ".csv", new File("build"));
         if (!keepFilesEnv) {
-          //  outFile.deleteOnExit();
+            outFile.deleteOnExit();
         }
 
         //build PrintMessage
