@@ -1,4 +1,4 @@
-package fr.pcscol.printer;
+package fr.pcscol.printer.model;
 
 public class PersonBean {
 

@@ -1,7 +1,7 @@
 package fr.pcscol.printer.controller.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.pcscol.printer.PersonBean;
+import fr.pcscol.printer.model.PersonBean;
 import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.model.PrintMessage;
 import fr.pcscol.printer.service.xdoc.XdocPrinterService;

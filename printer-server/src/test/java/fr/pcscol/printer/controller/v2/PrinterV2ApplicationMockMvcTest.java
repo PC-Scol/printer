@@ -2,7 +2,7 @@ package fr.pcscol.printer.controller.v2;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.pcscol.printer.PersonBean;
+import fr.pcscol.printer.model.PersonBean;
 import fr.pcscol.printer.PrinterUtil;
 import fr.pcscol.printer.api.v2.model.FreemarkerPrintMessage;
 import fr.pcscol.printer.api.v2.model.JasperPrintMessage;

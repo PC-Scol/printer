@@ -1,0 +1,271 @@
+<#setting locale="en_US">
+<#setting number_format="0.000">
+${libellePvJury}
+${libellePeriode}
+
+<#-- affichage ligne groupements -->
+,,,<#rt>
+<#list listeObjetMaquette as objetMaquette>
+${objetMaquette.groupement},${afficherVirgule(calculerVirguleObjetMaquette(objetMaquette, -1))}<#t>
+</#list>
+
+<#-- affichage ligne Objets Maquette -->
+,,,<#rt>
+<#list listeObjetMaquette as objetMaquette>
+${objetMaquette.code} - ${objetMaquette.libelle},${afficherVirgule(calculerVirguleObjetMaquette(objetMaquette, -1))}<#t>
+</#list>
+
+<#-- affichage ligne headers colonnes (Evaluations Finales, Session 1 etc...) -->
+,,,<#rt>
+<#list listeObjetMaquette as objetMaquette>
+<#--amngt-->,<#if objetMaquette.evaluationFinale??>${afficherHeaderEvaluationFinale(objetMaquette.evaluationFinale)}</#if><#if objetMaquette.session1??>${afficherHeaderSession(objetMaquette.session1, "1")}</#if><#if objetMaquette.session2??>${afficherHeaderSession(objetMaquette.session2, "2")}</#if><#t>
+</#list>
+
+<#-- affichage ligne colonnes (Amngt, Résultat etc...) -->
+Code apprenant,Nom,Prénom,<#rt>
+<#list listeObjetMaquette as objetMaquette>
+Amngt,<#if objetMaquette.evaluationFinale??>${afficherColonneEvaluationFinale(objetMaquette.evaluationFinale)}</#if><#if objetMaquette.session1??>${afficherColonneSession(objetMaquette.session1)}</#if><#if objetMaquette.session2??>${afficherColonneSession(objetMaquette.session2)}</#if><#t>
+</#list>
+
+<#-- affichage des lignes apprenants -->
+<#list listeApprenants as apprenant>
+${apprenant.code},${apprenant.nomFamille},${apprenant.prenom},<#rt>
+<#list listeObjetMaquette as objetMaquette>
+<#if apprenant.donneeObjetMaquetteMap[objetMaquette.code]??>
+<#assign donneeObjetMaquette=apprenant.donneeObjetMaquetteMap[objetMaquette.code]>
+${donneeObjetMaquette.amenagement},<#if objetMaquette.evaluationFinale??>${afficherDonneeEvaluationFinale(objetMaquette.evaluationFinale, donneeObjetMaquette.evaluationFinale)}</#if><#if objetMaquette.session1??>${afficherDonneeSession(objetMaquette.session1, donneeObjetMaquette.session1)}</#if><#if objetMaquette.session2??>${afficherDonneeSession(objetMaquette.session2, donneeObjetMaquette.session2)}</#if><#t>
+<#else>
+${afficherVirgule(calculerVirguleObjetMaquette(objetMaquette))}<#t>
+</#if>
+</#list>
+
+</#list>
+<#-- ------------------- -->
+<#-- fonctions affichage -->
+<#-- ------------------- -->
+
+<#function afficherVirgule nombre>
+  <#local string = "">
+  <#list 0..nombre as i>
+    <#local string = "${string},">
+  </#list>
+  <#return string>
+</#function>
+
+<#-- ----------------- -->
+<#-- affichage headers -->
+<#-- ----------------- -->
+
+<#function afficherHeaderEvaluationFinale evaluationFinale>
+  <#return "Evaluations Finales${afficherVirgule(calculerVirguleEvaluationFinale(evaluationFinale, -1))}">
+</#function>
+
+<#function afficherHeaderSession session numero>
+  <#local string = "Session ${numero}${afficherVirgule(calculerVirguleSession(session, -1, false))}">
+  <#if session.controle1??>
+    <#local string = "${string}Ctrl 1${afficherVirgule(calculerVirguleControle(session.controle1, -1))}">
+  </#if>
+  <#if session.controle2??>
+    <#local string = "${string}Ctrl 2${afficherVirgule(calculerVirguleControle(session.controle2, -1))}">
+  </#if>
+  <#return string>
+</#function>
+
+<#-- ------------------ -->
+<#-- affichage colonnes -->
+<#-- ------------------ -->
+
+<#function afficherColonneEvaluationFinale evaluationFinale>
+  <#local string = "">
+  <#if evaluationFinale.resultat>
+    <#local string = "Résultat,">
+  </#if>
+  <#if evaluationFinale.creditEcts>
+    <#local string = "${string}Crédit ECTS,">
+  </#if>
+  <#if evaluationFinale.mention>
+    <#local string = "${string}Mention Honorifique,">
+  </#if>
+  <#if evaluationFinale.gradeGpa>
+    <#local string = "${string}Grade GPA,">
+  </#if>
+  <#if evaluationFinale.notationEcts>
+    <#local string = "${string}Notation ECTS,">
+  </#if>
+  <#if evaluationFinale.noteFinale>
+    <#local string = "${string}Note Finale,">
+  </#if>
+  <#if evaluationFinale.pointJury>
+    <#local string = "${string}Point Jury,">
+  </#if>
+  <#if evaluationFinale.noteObjet>
+    <#local string = "${string}Note Objet,">
+  </#if>
+  <#return string>
+</#function>
+
+<#function afficherColonneSession session>
+  <#local string = "">
+  <#if session.resultat>
+    <#local string = "Résultat,">
+  </#if>
+  <#if session.note>
+    <#local string = "${string}Note,">
+  </#if>
+  <#if session.controle1??>
+    <#local string = "${string}${afficherColonneControle(session.controle1)}">
+  </#if>
+  <#if session.controle2??>
+    <#local string = "${string}${afficherColonneControle(session.controle2)}">
+  </#if>
+  <#return string>
+</#function>
+
+<#function afficherColonneControle controle>
+  <#local string = "">
+  <#if controle.resultat>
+    <#local string = "Résultat,">
+  </#if>
+  <#if controle.note>
+    <#local string = "${string}Note,">
+  </#if>
+  <#return string>
+</#function>
+
+<#-- ------ -->
+<#-- Calcul -->
+<#-- ------ -->
+
+<#function calculerVirguleControle controle init=0>
+  <#local count = init>
+  <#if controle.resultat>
+    <#local count++>
+  </#if>
+  <#if controle.note>
+    <#local count++>
+  </#if>
+  <#return count>
+</#function>
+
+<#function calculerVirguleSession session init=0 avecControle=true>
+  <#local count = init>
+  <#if session.resultat>
+    <#local count++>
+  </#if>
+  <#if session.note>
+    <#local count++>
+  </#if>
+  <#if avecControle>
+    <#if session.controle1??>
+      <#local count = count + calculerVirguleControle(session.controle1) >
+    </#if>
+    <#if session.controle2??>
+      <#local count = count + calculerVirguleControle(session.controle2) >
+    </#if>
+  </#if>
+  <#return count>
+</#function>
+
+<#function calculerVirguleEvaluationFinale evaluationFinale init=0>
+  <#local count = init>
+  <#if evaluationFinale.resultat>
+    <#local count++>
+  </#if>
+  <#if evaluationFinale.creditEcts>
+    <#local count++>
+  </#if>
+  <#if evaluationFinale.mention>
+    <#local count++>
+  </#if>
+  <#if evaluationFinale.gradeGpa>
+    <#local count++>
+  </#if>
+  <#if evaluationFinale.notationEcts>
+    <#local count++>
+  </#if>
+  <#if evaluationFinale.noteFinale>
+    <#local count++>
+  </#if>
+  <#if evaluationFinale.pointJury>
+    <#local count++>
+  </#if>
+  <#if evaluationFinale.noteObjet>
+    <#local count++>
+  </#if>
+  <#return count>
+</#function>
+
+<#function calculerVirguleObjetMaquette objetMaquette init=0>
+  <#local count = init>
+  <#if objetMaquette.evaluationFinale??>
+    <#local count = count + calculerVirguleEvaluationFinale(objetMaquette.evaluationFinale)>
+  </#if>
+  <#if objetMaquette.session1??>
+    <#local count = count + calculerVirguleSession(objetMaquette.session1)>
+  </#if>
+  <#if objetMaquette.session2??>
+    <#local count = count + calculerVirguleSession(objetMaquette.session2)>
+  </#if>
+  <#return count>
+</#function>
+
+<#-- ----------------- -->
+<#-- affichage donnees -->
+<#-- ----------------- -->
+
+<#function afficherDonneeEvaluationFinale evaluationFinale, donneeEvaluationFinale>
+  <#local string = "">
+  <#if evaluationFinale.resultat>
+    <#local string = "${donneeEvaluationFinale.resultat},">
+  </#if>
+  <#if evaluationFinale.creditEcts>
+    <#local string = "${string}${donneeEvaluationFinale.creditEcts},">
+  </#if>
+  <#if evaluationFinale.mention>
+    <#local string = "${string}${donneeEvaluationFinale.mention},">
+  </#if>
+  <#if evaluationFinale.gradeGpa>
+    <#local string = "${string}${donneeEvaluationFinale.gradeGpa},">
+  </#if>
+  <#if evaluationFinale.notationEcts>
+    <#local string = "${string}${donneeEvaluationFinale.notationEcts},">
+  </#if>
+  <#if evaluationFinale.noteFinale>
+    <#local string = "${string}${donneeEvaluationFinale.noteFinale},">
+  </#if>
+  <#if evaluationFinale.pointJury>
+    <#local string = "${string}${donneeEvaluationFinale.pointJury},">
+  </#if>
+  <#if evaluationFinale.noteObjet>
+    <#local string = "${string}${donneeEvaluationFinale.noteObjet},">
+  </#if>
+  <#return string>
+</#function>
+
+<#function afficherDonneeSession session, donneeSession>
+  <#local string = "">
+  <#if session.resultat>
+    <#local string = "${donneeSession.resultat},">
+  </#if>
+  <#if session.note>
+    <#local string = "${string}${donneeSession.note},">
+  </#if>
+  <#if session.controle1??>
+    <#local string = "${string}${afficherDonneeControle(session.controle1, donneeSession.controle1)}">
+  </#if>
+  <#if session.controle2??>
+    <#local string = "${string}${afficherDonneeControle(session.controle2, donneeSession.controle2)}">
+  </#if>
+  <#return string>
+</#function>
+
+<#function afficherDonneeControle controle, donneeControle>
+  <#local string = "">
+  <#if controle.resultat>
+    <#local string = "${donneeControle.resultat},">
+  </#if>
+  <#if controle.note>
+    <#local string = "${string}${donneeControle.note},">
+  </#if>
+  <#return string>
+</#function>
