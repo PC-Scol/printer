@@ -38,7 +38,7 @@ ${donneeObjetMaquette.amenagement},<#if objetMaquette.evaluationFinale??>${affic
 ${afficherVirgule(calculerVirguleObjetMaquette(objetMaquette))}<#t>
 </#if>
 </#list>
-
+<#-- saut de ligne -->
 </#list>
 <#-- ------------------- -->
 <#-- fonctions affichage -->
