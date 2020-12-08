@@ -8,4 +8,8 @@ printer:
     resource-folder: /jasper
 
 #actuator
-#management.server.port=9090
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health", "info", "prometheus"]
