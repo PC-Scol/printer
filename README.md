@@ -26,7 +26,7 @@ docker pull pcscol/printer-server
 ### Configure the application.yml :
 ```
 printer:
-  template:
+  xdoc:
     base-url: file:///app/resources/templates/xdoc
   freemarker:
     base-path: /app/resources/templates/freemarker
@@ -35,7 +35,7 @@ printer:
     resource-folder: /app/resources/templates/jasper
 ```
 
-- printer.template.base-url : base url for xdoc templates
+- printer.xdoc.base-url : base url for xdoc templates
 - printer.freemarker.base-path : base path for freemarker templates
 - printer.jasper: 
     - base-url : base url for jasper templates
