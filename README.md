@@ -20,7 +20,7 @@ And a data model. Then the merge process will produce a document (odt, docx, doc
 
 ### Pull the latest docker image :
 ```
-docker pull pcscol/printer-server
+docker pull pcscol/printer-server:$VERSION
 ```
 
 ### Configure the application.yml :
